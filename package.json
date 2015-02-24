@@ -1,0 +1,16 @@
+{
+  "name": "bandicoot",
+  "version": "0.0.1",
+  "description": "my web framework haha",
+  "main": "src/main.js",
+  "repository": "",
+  "author": "Joel Denning <joeldenning@gmail.com>",
+  "dependencies": {},
+  "devDependencies": {
+    "sinon": "~1.12.2",
+    "chai": "~2.1.0"
+  },
+  "scripts": {
+    "test": "mocha --recursive --grep browser-code/.+ --invert"
+  }
+}
