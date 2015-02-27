@@ -1,7 +1,7 @@
 DomEvent({
 	application: 'To-do list',
 	owner: 'Joel',
-	description: 'add new item'
+	description: 'add new item',
 	domVariables: {
 		todoList: {}
 	},
@@ -10,7 +10,7 @@ DomEvent({
 			checkbox: 'input',
 			label: 'label'
 		}
-	}
+	},
 	businessLogic: function(domVariables, domExamples) {
 		if(domVariables.newItem.getValue().length < 1) {
 			Event('To-do list/Joel/new item name is blank')
@@ -26,6 +26,6 @@ DomEvent({
 Event({
 	application: 'To-do list',
 	owner: 'Joel',
-	description: 'new item name is blank',
+	description: 'new item name is blank'
 
 })

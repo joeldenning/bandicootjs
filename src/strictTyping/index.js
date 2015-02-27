@@ -1,7 +1,4 @@
-var fs = require('fs')
-var moduleDirPath = __dirname + '/../strictTyping/'
-var objectDefinitionsPath = moduleDirPath + 'objectDefinitions/'
-var objectDefinitionBuilderFactory = require(moduleDirPath + 'objectDefinitionBuilderFactory.js')
+var objectDefinitionBuilderFactory = require('../strictTyping/builder/factory.js');
 
 module.exports.build = function() {
     var module = {
@@ -17,11 +14,7 @@ module.exports.build = function() {
         }
     }
     
-    fs.readdirSync(objectDefinitionsPath).forEach(function(objectDefinitionFileName) {
-        var objectDefinitionFactory = require(objectDefinitionsPath + objectDefinitionFileName)
-        var objectDefinitionName = objectDefinitionFileName.substr(0, objectDefinitionFileName.length-3);
-        module.defineStrictlyTypedObject(objectDefinitionName, objectDefinitionFactory)
-    })
+    module.defineStrictlyTypedObject('DomEvent', require('../strictTyping/objectDefinitions/DomEvent.js'));
     
     return module;
 }

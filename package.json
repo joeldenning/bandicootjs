@@ -1,16 +1,23 @@
 {
   "name": "bandicoot",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "my web framework haha",
   "main": "src/main.js",
   "repository": "",
   "author": "Joel Denning <joeldenning@gmail.com>",
   "dependencies": {},
   "devDependencies": {
+    "browserify": "^9.0.3",
+    "chai": "~2.1.0",
+    "gulp": "^3.8.11",
+    "gulp-clean": "^0.3.1",
+    "gulp-mocha": "^2.0.0",
+    "gulp-util": "^3.0.4",
+    "jsdom": "^4.0.0",
     "sinon": "~1.12.2",
-    "chai": "~2.1.0"
+    "vinyl-source-stream": "^1.0.0"
   },
   "scripts": {
-    "test": "mocha --recursive --grep browser-code/.+ --invert"
+    "test": "mocha"
   }
 }

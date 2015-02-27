@@ -1,0 +1,1 @@
+b = bandicoot = coot = require('./bandicoot-builder.js').build(); 
