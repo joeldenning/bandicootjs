@@ -4,17 +4,28 @@ module.exports.build = function() {
     var module = {
         objectDefinitions: {},
         defineStrictlyTypedObject: function(name, objectDefinitionFactory) {
-            var objectDefinitionBuilder = objectDefinitionBuilderFactory.instance();
+            var objectDefinitionBuilder = objectDefinitionBuilderFactory.instance(name);
             objectDefinitionFactory(objectDefinitionBuilder);
             objectDefinitionBuilder.validate();
             if (typeof module.objectDefinitions[name] !== 'undefined') {
                 throw "Cannot create strictly typed object definition '" + name + "' because a definition with that name already exists"
             }
             module.objectDefinitions[name] = objectDefinitionBuilder.build()
+        },
+        validateObjectIsOfType: function(obj, nameOfStrictlyTypedObject) {
+            if (!module.objectDefinitions[nameOfStrictlyTypedObject]) {
+                throw 'No such strictly typed object "' + nameOfStrictlyTypedObject + "'";
+            }
+            try {
+                require('./validator/validator.js').validate(module.objectDefinitions[nameOfStrictlyTypedObject], obj);
+            } catch (validationException) {
+                throw 'Error creating object of type "' + nameOfStrictlyTypedObject + '": ' + validationException;
+            }
         }
     }
     
-    module.defineStrictlyTypedObject('DomEvent', require('../strictTyping/objectDefinitions/DomEvent.js'));
+    module.defineStrictlyTypedObject('Scenario', require('../strictTyping/objectDefinitions/Scenario.js'));
+    module.defineStrictlyTypedObject('Event', require('../strictTyping/objectDefinitions/Event.js'));
     
     return module;
 }

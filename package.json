@@ -9,12 +9,15 @@
   "devDependencies": {
     "browserify": "^9.0.3",
     "chai": "~2.1.0",
+    "esprima": "^1.2.5",
     "gulp": "^3.8.11",
     "gulp-clean": "^0.3.1",
     "gulp-mocha": "^2.0.0",
     "gulp-util": "^3.0.4",
     "jsdom": "^4.0.0",
+    "lodash": "^3.5.0",
     "sinon": "~1.12.2",
+    "static-eval": "^0.2.3",
     "vinyl-source-stream": "^1.0.0"
   },
   "scripts": {
