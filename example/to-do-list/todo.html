@@ -1,9 +1,9 @@
 <head>
-  <script type="text/javascript" src="bandicoot.js"></script>
+  <script type="text/javascript" src="/bandicootjs/dist/bandicoot.js"></script>
   <script type="text/javascript" src="/bandicootjs/example/to-do-list/todo.js"></script>
 
   <script type="html/building-blocks">
-    <li data-type="building-block" data-name="thingToDo">
+    <li data-type="building-block" data-name="thingToDo" data-scope="to-do list">
       <input data-type="element" data-name="checkbox" type="checkbox">
       <label data-type="element" data-name="label"></label>
     </li>
@@ -11,12 +11,14 @@
 </head>
 
 <body>
-  <ul data-type="list" data-name="todoList" style="list-style-type: none">
-    <li>
-      <input data-type="element" data-name="checkbox" type="checkbox" name="to-do-list" value="soft-soap">
-      <label data-type="element" data-name="label">Buy soft soap</label>
-    </li>
-  </ul>
-  <input data-type="element" data-name="newItem" type="text" placeholder="A new thing to do">
-  <button onclick="DomEvent('To-do-list/Joel/add new item')">Add thing to do</button>
+  <div data-scope="to-do list">
+    <ul data-type="list" data-name="todoList" style="list-style-type: none">
+      <li>
+        <input data-type="element" data-name="checkbox" type="checkbox" name="to-do-list" value="soft-soap">
+        <label data-type="element" data-name="label">Buy soft soap</label>
+      </li>
+    </ul>
+    <input data-type="element" data-name="newItemUserInput" type="text" placeholder="A new thing to do">
+    <button onclick="DomEvent('To-do-list/Joel/add new item')">Add thing to do</button>
+  </div>
 </body>
