@@ -1,5 +1,4 @@
 var lodash = require('lodash');
-var evaluate = require('static-eval');
 var esprima = require('esprima');
 
 function validateProperty(property, object, otherTypes) {

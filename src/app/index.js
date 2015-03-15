@@ -1,9 +1,9 @@
 module.exports.build = function(bandicoot) {
   bandicoot.app = {
     Scenarios: {},
-    ScenarioDefinition: require('./definition/Scenario.js'),
+    ScenarioPrototype: require('./prototype/Scenario.js'),
     Events: {},
-    EventDefinition: require('./definition/Event.js'),
+    EventPrototype: require('./prototype/Event.js'),
     EventExecution: require('./execution/Event.js')
   };
 
@@ -13,7 +13,7 @@ module.exports.build = function(bandicoot) {
     } else {
       bandicoot.library.strictTyping.validateObjectIsOfType(input, 'Scenario');
       var scenario = input;
-      var fullyQualifiedName = bandicoot.app.ScenarioDefinition.getFullyQualifiedName(scenario);
+      var fullyQualifiedName = bandicoot.app.ScenarioPrototype.getFullyQualifiedName(scenario);
       if (typeof bandicoot.app.Scenarios[fullyQualifiedName] !== 'undefined') {
         throw 'Event with name "' + fullyQualifiedName + "' already exists";
       }
@@ -23,15 +23,15 @@ module.exports.build = function(bandicoot) {
 
   bandicoot.Event = function(input) {
     if (isFunctionCall(input)) {
-      bandicoot.app.EventExecution(bandicoot.app.Events, input, bandicoot.library.slashNamespacing);
+      bandicoot.app.EventExecution(bandicoot, input);
     } else {
       bandicoot.library.strictTyping.validateObjectIsOfType(input, 'Event');
       var event = input;
-      var fullyQualifiedName = bandicoot.app.EventDefinition.getFullyQualifiedName(event);
-      if (typeof bandicoot.app.EventDefinition[fullyQualifiedName] !== 'undefined') {
+      var fullyQualifiedName = bandicoot.app.EventPrototype.getFullyQualifiedName(event);
+      if (typeof bandicoot.app.EventPrototype[fullyQualifiedName] !== 'undefined') {
         throw 'Event with name "' + fullyQualifiedName + "' already exists";
       }
-      bandicoot.app.Events[fullyQualifiedName] = event;
+      bandicoot.library.slashNamespacing.addPropertyToObjectFromSlashNamespacedName(bandicoot.app.Events, fullyQualifiedName, event);
     }
   }
 };

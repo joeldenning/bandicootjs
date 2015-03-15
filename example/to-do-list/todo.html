@@ -3,8 +3,8 @@
   <script type="text/javascript" src="/bandicootjs/example/to-do-list/todo.js"></script>
 
   <script type="html/building-blocks">
-    <li data-type="building-block" data-name="thingToDo" data-scope="to-do list">
-      <input data-type="element" data-name="checkbox" type="checkbox">
+    <li data-type="list-item">
+      <input data-type="element" data-name="checkbox" type="checkbox" name="to-do-list" value="soft-soap">
       <label data-type="element" data-name="label"></label>
     </li>
   </script>
@@ -13,12 +13,12 @@
 <body>
   <div data-scope="to-do list">
     <ul data-type="list" data-name="todoList" style="list-style-type: none">
-      <li>
+      <li data-type="list-item">
         <input data-type="element" data-name="checkbox" type="checkbox" name="to-do-list" value="soft-soap">
         <label data-type="element" data-name="label">Buy soft soap</label>
       </li>
     </ul>
     <input data-type="element" data-name="newItemUserInput" type="text" placeholder="A new thing to do">
-    <button onclick="DomEvent('To-do-list/Joel/add new item')">Add thing to do</button>
+    <button onclick="coot.Event('To-do list/create new item')">Add thing to do</button>
   </div>
 </body>
