@@ -9,9 +9,9 @@ describe('Happy, normal scenario', function() {
   it('doesn\'t throw any errors when created', function() {
     bandicoot.Scenario({
       where: 'To-do list',
-      action: 'create new item',
+      what: 'create new item',
       when: 'domVariables.newItem.getValue().length > 1',
-      what: 'add new row to bulleted list',
+      outcome: 'add new row to bulleted list',
       how: function(domVariables, domExamples, services) {
         if(domVariables.newItem.getValue().length < 1) {
           Event('To-do list/Joel/new item name is blank')

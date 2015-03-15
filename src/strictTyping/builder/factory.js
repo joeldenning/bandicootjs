@@ -28,7 +28,7 @@ funcs.whereEachElementIs = function(property, elementType) {
   return property;
 }
 
-funcs.withType = function(property, type) {
+funcs.withType = function(property, type, arg) {
   switch(type) {
     case 'object':
       property.whereEachPropertyIs = lodash.bind(funcs.whereEachPropertyIs, null, property);
@@ -42,6 +42,12 @@ funcs.withType = function(property, type) {
     case 'conditionalExpressionString':
     break;
     case 'function':
+    break;
+    case 'strictlyTypedObject':
+      if (lodash.isUndefined(arg) || !lodash.isString(arg)) {
+        throw 'When building property "' + property.name + '" of type "strictlyTypedObject", you must provide an additional argument specifying which strictlyTypedObject';
+      }
+      property.strictlyTypedObject = arg;
     break;
     default:
       throw 'When building property "' + property.name + '", there is no such type "' + type + '"';
@@ -62,8 +68,8 @@ module.exports = {
         }
         var property = {
           name: name,
-          withType: function(type) {
-            return funcs.withType(property, type);
+          withType: function(type, arg) {
+            return funcs.withType(property, type, arg);
           }
         };
         builder.properties[name] = property;
@@ -87,8 +93,28 @@ module.exports = {
           }
         });
       },
+      allRemainingProperties: function() {
+        var property = {
+          withType: function(type, arg) {
+            return funcs.withType(property, type, arg);
+          }
+        }
+        builder.defaultProperty = property;
+        return property;
+      },
       build: function() {
-        return builder.properties;
+        var builtProperties = {};
+        var customizer = function(objectValue, sourceValue) {
+          return lodash.isFunction(sourceValue) ? undefined : sourceValue;
+        };
+        lodash.assign(builtProperties, builder.properties, customizer);
+
+        var builtDefaultProperty = {};
+        lodash.assign(builtDefaultProperty, builder.defaultProperty, customizer);
+        return {
+          properties: builtProperties,
+          defaultProperty: builtDefaultProperty
+        };
       }
     }
     return builder;

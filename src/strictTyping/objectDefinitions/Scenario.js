@@ -13,4 +13,4 @@ module.exports = function(objectDefinitionBuilder) {
   objectDefinitionBuilder.requireProperty('where');
   objectDefinitionBuilder.requireProperty('what');
   objectDefinitionBuilder.requireProperty('when');
-}
+};

@@ -25,7 +25,7 @@ coot.Scenario({
 	outcome: 'add new row to bulleted list',
 	where: 'To-do list',
 	what: 'create new item',
-	when: 'this.dom.newItemUserInput.value.length > 1',
+	when: 'this.dom.newItemUserInput.value.length > 0',
 	how: function() {
 		var newItem = this.buildingBlocks.thingToDo.create();
 		newItem.checkbox.checked = false;
