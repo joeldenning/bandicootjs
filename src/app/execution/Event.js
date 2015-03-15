@@ -36,13 +36,9 @@ module.exports = function(bandicoot, eventName) {
   Object.keys(possibleScenarios).forEach(function(possibleScenarioName) {
     var possibleScenario = possibleScenarios[possibleScenarioName];
     var booleanExpression = esprima.parse(possibleScenario.when).body[0].expression;
-    var evalArgs = {
-      this: {}
-    };
-    _.assign(evalArgs.this, scenarioArgs);
 
-    var booleanExpressionResult = evaluate(booleanExpression, evalArgs);
-    if (booleanExpressionResult) {
+    var booleanExpressionResult = evaluate(booleanExpression, {}, scenarioArgs);
+    if (booleanExpressionResult === true) {
       scenariosToExecute.push(possibleScenario);
     }
   });

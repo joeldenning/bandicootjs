@@ -1,6 +1,11 @@
 var _ = require('lodash');
 
-module.exports.build = function() {
+module.exports.build = function(strictTyping) {
+  var elementDefinitions = {};
+  var inputDefinition = require('./elements/input.js');
+  strictTyping.validateObjectIsOfType(inputDefinition, 'DomElementDefinition');
+  elementDefinitions[inputDefinition.tagName] = inputDefinition;
+
   return {
     extractToVariables: function(mapping, types) {
       var matchingScopes = document.querySelectorAll('[data-scope="' + mapping.$scope + '"]');
@@ -26,13 +31,29 @@ module.exports.build = function() {
                 if (!dataName) {
                   throw 'element must have a data-name';
                 }
-                
+
                 var jsEl = {};
                 for (var i=0; i<element.attributes.length; i++) {
                   if (element.attributes[i].nodeName.indexOf('data-') !== 0) {
                     jsEl[element.attributes[i].nodeName] = element.attributes[i].value;
                   }
                 }
+                if (elementDefinitions[element.tagName]) {
+                  Object.keys(elementDefinitions[element.tagName].defaultAttributeValues).forEach(function(attributeName) {
+                    if (_.isUndefined(jsEl[attributeName])) {
+                      var defaultValue = elementDefinitions[element.tagName].defaultAttributeValues[attributeName];
+                      switch (typeof defaultValue) {
+                        case 'string':
+                          jsEl[attributeName] = defaultValue;
+                        break;
+                        case 'function':
+                          jsEl[attributeName] = defaultValue(element);
+                        break;
+                      }
+                    }
+                  });
+                }
+
                 if (listItemToAddTo) {
                   if (listItemToAddTo[dataName]) {
                     throw "element named '" + dataName + "' already exists in list '" + listToAddTo + "'";

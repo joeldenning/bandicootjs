@@ -38,7 +38,7 @@ coot.Scenario({
 	outcome: 'warn the user that the item will not be added to the list',
 	where: 'To-do list',
 	what: 'create new item',
-	when: 'this.dom.newItemUserInput.value.match(/[ \\t\\n]*/)',
+	when: 'this.dom.newItemUserInput.value.length === 0',
 	how: function() {
 		alert('I am sorry but you can\'t add an item full of whitespace characters');
 	}
