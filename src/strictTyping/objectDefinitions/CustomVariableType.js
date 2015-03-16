@@ -1,3 +1,3 @@
 module.exports = function(objectDefinitionBuilder) {
-  objectDefinitionBuilder.allRemainingProperties().withType('string');
+  objectDefinitionBuilder.allRemainingProperties().withType('string').matchingPattern(/[<>^]+/);
 }

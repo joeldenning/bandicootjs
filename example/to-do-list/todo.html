@@ -2,8 +2,8 @@
   <script type="text/javascript" src="/bandicootjs/dist/bandicoot.js"></script>
   <script type="text/javascript" src="/bandicootjs/example/to-do-list/todo.js"></script>
 
-  <script type="html/building-blocks">
-    <li data-type="list-item">
+  <script type="html/building-blocks" data-scope="To-do list">
+    <li data-type="object" data-name="thingToDo">
       <input data-type="element" data-name="checkbox" type="checkbox" name="to-do-list" value="soft-soap">
       <label data-type="element" data-name="label"></label>
     </li>
@@ -11,9 +11,9 @@
 </head>
 
 <body>
-  <div data-scope="to-do list">
+  <div data-scope="To-do list">
     <ul data-type="list" data-name="todoList" style="list-style-type: none">
-      <li data-type="list-item">
+      <li data-type="list-item" data-name="thingToDo">
         <input data-type="element" data-name="checkbox" type="checkbox" name="to-do-list" value="soft-soap">
         <label data-type="element" data-name="label">Buy soft soap</label>
       </li>

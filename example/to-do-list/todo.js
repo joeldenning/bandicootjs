@@ -3,12 +3,10 @@ coot.Event({
 	what: 'create new item',
 	this: {
 		dom: {
-			$scope: 'to-do list',
 			todoList: 'list<thingToDo>',
 			newItemUserInput: 'element<input>',
 		},
 		buildingBlocks: {
-			$scope: 'to-do list',
 			thingToDo: 'thingToDo'
 		}
 	},
@@ -27,10 +25,10 @@ coot.Scenario({
 	what: 'create new item',
 	when: 'this.dom.newItemUserInput.value.length > 0',
 	how: function() {
-		var newItem = this.buildingBlocks.thingToDo.create();
+		var newItem = this.buildingBlocks.thingToDo.cloneDeep();
 		newItem.checkbox.checked = false;
 		newItem.label.innerHTML = this.dom.newItemUserInput.value;
-		this.dom.todoList.insert(newItemUserInput);
+		this.dom.todoList.push(newItem);
 	}
 });
 
