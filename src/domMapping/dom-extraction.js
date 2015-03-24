@@ -16,13 +16,11 @@ function traverseElement(element, bandicootElements, bandicootLists, bandicootOb
 
           var jsEl = {
             cloneDeep: function() {
-              return _.cloneDeep(jsEl);
+              return _.cloneDeep(jsEl, require('./cloneDeep-customizer.js'));
             }
           };
           for (var i=0; i<element.attributes.length; i++) {
-            if (element.attributes[i].nodeName.indexOf('data-') !== 0) {
-              jsEl[element.attributes[i].nodeName] = element.attributes[i].value;
-            }
+            jsEl[element.attributes[i].nodeName] = element.attributes[i].value;
           }
           jsEl.tagName = element.tagName;
           if (elementDefinitions[element.tagName]) {
@@ -44,10 +42,6 @@ function traverseElement(element, bandicootElements, bandicootLists, bandicootOb
           }
 
           if (bandicootListItemToAddTo) {
-            if (bandicootListItemToAddTo[dataName]) {
-              throw "element named '" + dataName + "' already exists in list item";
-            }
-
             bandicootListItemToAddTo[dataName] = jsEl;
           } else if (bandicootObjectToAddTo) {
             if (bandicootObjectToAddTo[dataName]) {
@@ -68,8 +62,9 @@ function traverseElement(element, bandicootElements, bandicootLists, bandicootOb
 
           bandicootListToAddTo = [];
           bandicootListToAddTo.cloneDeep = function() {
-            return _.cloneDeep(bandicootListToAddTo);
+            return _.cloneDeep(bandicootListToAddTo, require('./cloneDeep-customizer.js'));
           };
+          bandicootListToAddTo.tagName = element.tagName;
 
           bandicootListItemToAddTo = undefined;
 
@@ -92,10 +87,12 @@ function traverseElement(element, bandicootElements, bandicootLists, bandicootOb
             throw "Cannot add a list item to a list item";
           }
 
-          bandicootListItemToAddTo = {};
-          bandicootListItemToAddTo.cloneDeep = function() {
-            return _.cloneDeep(bandicootListItemToAddTo);
-          }
+          bandicootListItemToAddTo = {
+            tagName: element.tagName,
+            cloneDeep: function() {
+              return _.cloneDeep(bandicootListItemToAddTo, require('./cloneDeep-customizer.js'));
+            }
+          };
 
           bandicootListToAddTo.push(bandicootListItemToAddTo);
         break;
@@ -105,10 +102,12 @@ function traverseElement(element, bandicootElements, bandicootLists, bandicootOb
             throw 'list must have a data-name';
           }
 
-          bandicootObjectToAddTo = {};
-          bandicootObjectToAddTo.cloneDeep = function() {
-            return _.cloneDeep(bandicootObjectToAddTo);
-          }
+          bandicootObjectToAddTo = {
+            tagName: element.tagName,
+            cloneDeep: function() {
+              return _.cloneDeep(bandicootObjectToAddTo, require('./cloneDeep-customizer.js'));
+            }
+          };
 
           if (bandicootObjects[dataName]) {
             throw "Object named '" + dataName + "' already exists";

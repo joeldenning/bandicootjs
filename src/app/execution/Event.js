@@ -52,12 +52,23 @@ module.exports = function(bandicoot, eventName) {
     }
   });
 
+  var scenarioDomState = {};
+
+  var atLeastOneScenarioSucceeded = false;
   scenariosToExecute.forEach(function(scenario) {
     try {
-      scenario.how.call(scenarioArgs);
+      var args = _.cloneDeep(scenarioArgs, require('../../domMapping/cloneDeep-customizer.js'))
+      scenario.how.call(args);
+      scenarioDomState[bandicoot.app.ScenarioPrototype.getFullyQualifiedName(scenario)] = args.dom;
+      atLeastOneScenarioSucceeded = true;
     } catch (ex) {
       console.log('Scenario "' + bandicoot.app.ScenarioPrototype.getFullyQualifiedName(scenario) + '" failed with error -- ' + ex.stack);
     }
   });
+
+  if (atLeastOneScenarioSucceeded) {
+    var newDomState = bandicoot.library.domPatching.calculateDesiredDomState(scenarioArgs.dom, scenarioDomState);
+    bandicoot.library.domPatching.patchDom(event.where, domVariables.dom, newDomState);
+  }
 
 };
