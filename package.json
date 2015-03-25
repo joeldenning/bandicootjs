@@ -22,6 +22,6 @@
     "vinyl-source-stream": "^1.0.0"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "gulp test"
   }
 }
