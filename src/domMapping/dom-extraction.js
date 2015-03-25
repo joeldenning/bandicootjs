@@ -15,6 +15,8 @@ function traverseElement(element, bandicootElements, bandicootLists, bandicootOb
           }
 
           var jsEl = {
+            dataType: dataType,
+            dataName: dataName,
             cloneDeep: function() {
               return _.cloneDeep(jsEl, require('./cloneDeep-customizer.js'));
             }
@@ -64,7 +66,17 @@ function traverseElement(element, bandicootElements, bandicootLists, bandicootOb
           bandicootListToAddTo.cloneDeep = function() {
             return _.cloneDeep(bandicootListToAddTo, require('./cloneDeep-customizer.js'));
           };
+          bandicootListToAddTo.push = function(listItem) {
+            if (listItem && listItem.dataType === 'object') {
+              listItem.dataType = 'list-item';
+            }
+            for (var i=0; i<arguments.length; i++) {
+              Array.prototype.push.call(this, arguments[i]);          
+            }
+          }
           bandicootListToAddTo.tagName = element.tagName;
+          bandicootListToAddTo.dataType = dataType;
+          bandicootListToAddTo.dataName = dataName;
 
           bandicootListItemToAddTo = undefined;
 
@@ -89,6 +101,8 @@ function traverseElement(element, bandicootElements, bandicootLists, bandicootOb
 
           bandicootListItemToAddTo = {
             tagName: element.tagName,
+            dataType: dataType,
+            dataName: dataName,
             cloneDeep: function() {
               return _.cloneDeep(bandicootListItemToAddTo, require('./cloneDeep-customizer.js'));
             }
@@ -104,6 +118,8 @@ function traverseElement(element, bandicootElements, bandicootLists, bandicootOb
 
           bandicootObjectToAddTo = {
             tagName: element.tagName,
+            dataType: dataType,
+            dataName: dataName,
             cloneDeep: function() {
               return _.cloneDeep(bandicootObjectToAddTo, require('./cloneDeep-customizer.js'));
             }

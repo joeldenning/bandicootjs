@@ -8,6 +8,10 @@ function setJsAttrAsDomAttr(key, value, domEl) {
   } else if (_.isNumber(value) || _.isString(value) || _.isBoolean(value)) {
     if (key.toLowerCase() === 'innerhtml') {
       domEl.innerHTML = value;
+    } else if (key === 'dataType') {
+      domEl.setAttribute('data-type', value);
+    } else if (key === 'dataName') {
+      domEl.setAttribute('data-name', value);
     } else {
       domEl.setAttribute(key, value);
     }
