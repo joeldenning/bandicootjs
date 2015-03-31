@@ -4,7 +4,6 @@ var source = require('vinyl-source-stream');
 var fs = require('fs');
 var mocha = require('gulp-mocha');
 var clean = require('gulp-clean');
-var watchify = require('watchify');
 var gutil = require('gulp-util');
 
 var mochaOpts = {
