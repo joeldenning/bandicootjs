@@ -20,13 +20,13 @@ coot.Event({
 });
 
 coot.Scenario({
-	outcome: 'add new row to bulleted list',
 	location: 'To-do list',
 	event: 'create new item',
+  scenario: 'add new row to bulleted list',
 	when: function() {
     return this.dom.newItemUserInput.value.length > 0;
   },
-	how: function() {
+	outcome: function() {
 		var newItem = this.buildingBlocks.thingToDo.cloneDeep();
 		delete newItem.checkbox.checked;
 		newItem.checkbox.value = this.dom.newItemUserInput.value;
@@ -36,13 +36,13 @@ coot.Scenario({
 });
 
 coot.Scenario({
-  outcome: 'warn the user that the item will not be added to the list',
   location: 'To-do list',
   event: 'create new item',
+  scenario: 'warn the user that the item will not be added to the list',
   when: function() {
     this.dom.newItemUserInput.value.length === 0
   },
-  how: function() {
+  outcome: function() {
     alert('I am sorry but you can\'t add an item full of whitespace characters');
   }
 });

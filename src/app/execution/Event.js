@@ -56,7 +56,7 @@ module.exports = function(bandicoot, eventName) {
   scenariosToExecute.forEach(function(scenario) {
     try {
       var args = _.cloneDeep(scenarioArgs, require('../../domMapping/cloneDeep-customizer.js'))
-      scenario.how.call(args);
+      scenario.outcome.call(args);
       scenarioDomState[bandicoot.app.ScenarioPrototype.getFullyQualifiedName(scenario)] = args.dom;
       atLeastOneScenarioSucceeded = true;
     } catch (ex) {
