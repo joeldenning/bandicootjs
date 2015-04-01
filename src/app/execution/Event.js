@@ -17,14 +17,14 @@ module.exports = function(bandicoot, eventName) {
   var domVariables = bandicoot.library.domMapping.extractToVariables(event.where);
   if (event.this.dom) {
     if (_.size(event.this.dom) > 0 && _.size(domVariables.dom) === 0) {
-      throw "No scope '" + event.where + "' was found in the dom";
+      throw "No location '" + event.where + "' was found in the dom";
     }
     bandicoot.library.domMapping.verifyTypes(event.this.dom, event.types, domVariables.dom);
   }
 
   if (event.this.buildingBlocks) {
     if (_.size(event.this.buildingBlocks) > 0 && _.size(domVariables.buildingBlocks) === 0) {
-      throw "No scope '" + event.where + "' was found in building blocks";
+      throw "No location '" + event.where + "' was found in building blocks";
     }
     bandicoot.library.domMapping.verifyTypes(event.this.buildingBlocks, event.types, domVariables.buildingBlocks);
   }
