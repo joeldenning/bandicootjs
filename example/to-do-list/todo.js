@@ -1,6 +1,6 @@
 coot.Event({
   location: 'To-do list',
-  what: 'create new item',
+  event: 'create new item',
   this: {
     dom: {
       todoList: 'list<thingToDo>',
@@ -22,7 +22,7 @@ coot.Event({
 coot.Scenario({
 	outcome: 'add new row to bulleted list',
 	location: 'To-do list',
-	what: 'create new item',
+	event: 'create new item',
 	when: function() {
     return this.dom.newItemUserInput.value.length > 0;
   },
@@ -38,7 +38,7 @@ coot.Scenario({
 coot.Scenario({
   outcome: 'warn the user that the item will not be added to the list',
   location: 'To-do list',
-  what: 'create new item',
+  event: 'create new item',
   when: function() {
     this.dom.newItemUserInput.value.length === 0
   },

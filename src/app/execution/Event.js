@@ -7,8 +7,8 @@ module.exports = function(bandicoot, eventName) {
   }
 
   var possibleScenarios;
-  if (bandicoot.app.Scenarios[event.location] && bandicoot.app.Scenarios[event.location][event.what]) {
-    possibleScenarios = bandicoot.app.Scenarios[event.location][event.what];
+  if (bandicoot.app.Scenarios[event.location] && bandicoot.app.Scenarios[event.location][event.event]) {
+    possibleScenarios = bandicoot.app.Scenarios[event.location][event.event];
   } else {
     console.log('No possible scenarios for ' + bandicoot.app.EventPrototype.getFullyQualifiedName(event));
     return;    
