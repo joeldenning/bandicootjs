@@ -23,7 +23,7 @@ coot.Scenario({
 	location: 'To-do list',
 	event: 'create new item',
   scenario: 'add new row to bulleted list',
-	when: function() {
+	condition: function() {
     return this.dom.newItemUserInput.value.length > 0;
   },
 	outcome: function() {
@@ -39,7 +39,7 @@ coot.Scenario({
   location: 'To-do list',
   event: 'create new item',
   scenario: 'warn the user that the item will not be added to the list',
-  when: function() {
+  condition: function() {
     this.dom.newItemUserInput.value.length === 0
   },
   outcome: function() {

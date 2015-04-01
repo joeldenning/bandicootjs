@@ -40,10 +40,10 @@ module.exports = function(bandicoot, eventName) {
     var args = _.cloneDeep(scenarioArgs, require('../../domMapping/cloneDeep-customizer.js'));
     var booleanExpressionResult;
     try {
-      booleanExpressionResult = possibleScenario.when.apply(args);
+      booleanExpressionResult = possibleScenario.condition.apply(args);
     } catch (ex) {
       console.log("Scenario '" + bandicoot.app.EventPrototype.getFullyQualifiedName(possibleScenario) 
-        + "' threw an error during evaluation of the 'when' expression -- " + ex.stack);
+        + "' threw an error during evaluation of the 'condition' expression -- " + ex.stack);
     }
     if (booleanExpressionResult === true) {
       scenariosToExecute.push(possibleScenario);
