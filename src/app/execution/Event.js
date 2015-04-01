@@ -6,6 +6,12 @@ module.exports = function(bandicoot, eventName) {
     throw "No such event '" + eventName + "' in bandicoot.app.Events object. Event names are of namespaced with slash (/) characters."; 
   }
 
+  var location = bandicoot.library.slashNamespacing.getValueFromNamespacedObject(bandicoot.app.Locations, event.location);
+
+  if (!location) {
+    throw "No such location '" + event.location + "' in bandicoot.app.Locations object.";
+  }
+
   var possibleScenarios;
   if (bandicoot.app.Scenarios[event.location] && bandicoot.app.Scenarios[event.location][event.event]) {
     possibleScenarios = bandicoot.app.Scenarios[event.location][event.event];
@@ -14,19 +20,19 @@ module.exports = function(bandicoot, eventName) {
     return;    
   }
 
-  var domVariables = bandicoot.library.domMapping.extractToVariables(event.location);
-  if (event.this.dom) {
-    if (_.size(event.this.dom) > 0 && _.size(domVariables.dom) === 0) {
-      throw "No location '" + event.location + "' was found in the dom";
+  var domVariables = bandicoot.library.domMapping.extractToVariables(location.location);
+  if (location.this.dom) {
+    if (_.size(location.this.dom) > 0 && _.size(domVariables.dom) === 0) {
+      throw "No location '" + location.location + "' was found in the dom";
     }
-    bandicoot.library.domMapping.verifyTypes(event.this.dom, event.types, domVariables.dom);
+    bandicoot.library.domMapping.verifyTypes(location.this.dom, location.types, domVariables.dom);
   }
 
-  if (event.this.buildingBlocks) {
-    if (_.size(event.this.buildingBlocks) > 0 && _.size(domVariables.buildingBlocks) === 0) {
-      throw "No location '" + event.location + "' was found in building blocks";
+  if (location.this.buildingBlocks) {
+    if (_.size(location.this.buildingBlocks) > 0 && _.size(domVariables.buildingBlocks) === 0) {
+      throw "No location '" + location.location + "' was found in building blocks";
     }
-    bandicoot.library.domMapping.verifyTypes(event.this.buildingBlocks, event.types, domVariables.buildingBlocks);
+    bandicoot.library.domMapping.verifyTypes(location.this.buildingBlocks, location.types, domVariables.buildingBlocks);
   }
 
   var scenarioArgs = {};

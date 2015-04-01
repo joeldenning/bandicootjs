@@ -1,11 +1,25 @@
+var _ = require('lodash');
+
 module.exports.build = function(bandicoot) {
   bandicoot.app = {
+    Locations: {},
+    LocationPrototype: require('./prototype/Location.js'),
     Scenarios: {},
     ScenarioPrototype: require('./prototype/Scenario.js'),
     Events: {},
     EventPrototype: require('./prototype/Event.js'),
     EventExecution: require('./execution/Event.js')
   };
+
+  bandicoot.Location = function(input) {
+    bandicoot.library.strictTyping.validateObjectIsOfType(input, 'Location');
+    var location = input;
+    var fullyQualifiedName = bandicoot.app.LocationPrototype.getFullyQualifiedName(location);
+    if (!_.isUndefined(bandicoot.app.Locations[fullyQualifiedName])) {
+      throw 'Location with name "' + fullyQualifiedName + "' already exists";
+    }
+    bandicoot.library.slashNamespacing.addPropertyToObjectFromSlashNamespacedName(bandicoot.app.Locations, fullyQualifiedName, location);
+  }
 
   bandicoot.Scenario = function(input) {
     if (isFunctionCall(input)) {
@@ -33,7 +47,7 @@ module.exports.build = function(bandicoot) {
       }
       bandicoot.library.slashNamespacing.addPropertyToObjectFromSlashNamespacedName(bandicoot.app.Events, fullyQualifiedName, event);
     }
-  }
+  };
 };
 
 function isFunctionCall(input) {

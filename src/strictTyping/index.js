@@ -14,7 +14,7 @@ module.exports.build = function() {
         },
         validateObjectIsOfType: function(obj, nameOfStrictlyTypedObject) {
             if (!module.objectDefinitions[nameOfStrictlyTypedObject]) {
-                throw 'No such strictly typed object "' + nameOfStrictlyTypedObject + "'";
+                throw 'No such strictly typed object "' + nameOfStrictlyTypedObject + '"';
             }
             try {
                 require('./validator/validator.js').validate(module.objectDefinitions[nameOfStrictlyTypedObject], obj, module.objectDefinitions);
@@ -31,6 +31,7 @@ module.exports.build = function() {
     module.defineStrictlyTypedObject('Scenario', require('../strictTyping/objectDefinitions/Scenario.js'));
     module.defineStrictlyTypedObject('Event', require('../strictTyping/objectDefinitions/Event.js'));
     module.defineStrictlyTypedObject('DomElementDefinition', require('../strictTyping/objectDefinitions/DomElementDefinition.js'));
+    module.defineStrictlyTypedObject('Location', require('../strictTyping/objectDefinitions/Location.js'));
     
     return module;
 }

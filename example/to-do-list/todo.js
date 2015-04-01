@@ -1,6 +1,5 @@
-coot.Event({
+coot.Location({
   location: 'To-do list',
-  event: 'create new item',
   this: {
     dom: {
       todoList: 'list<thingToDo>',
@@ -15,9 +14,13 @@ coot.Event({
       checkbox: 'element<input>',
       label: 'element<label>'
     }
-  },
-  services: []
+  }
 });
+
+coot.Event({
+  location: 'To-do list',
+  event: 'create new item'
+})
 
 coot.Scenario({
 	location: 'To-do list',
@@ -46,3 +49,15 @@ coot.Scenario({
     alert('I am sorry but you can\'t add an item full of whitespace characters');
   }
 });
+
+coot.Scenario({
+  location: 'To-do list',
+  event: 'item checked',
+  scenario: 'strikeout the corresponding label',
+  condition: function() {
+    return true;
+  },
+  outcome: function() {
+
+  }
+})
