@@ -165,22 +165,22 @@ function mergeListsElementsAndObjects(target, lists, elements, objects) {
   }
 }
 
-module.exports = function(elementDefinitions, scope) {
-  var matchingScopes = document.querySelectorAll('[data-scope="' + scope + '"]');
-  var domScope;
-  var buildingBlockScopes = [];
-  for (var i=0; i<matchingScopes.length; i++) {
-    if (matchingScopes[i].tagName.toUpperCase() === 'SCRIPT') {
-      if (matchingScopes[i].getAttribute('type') === 'html/building-blocks') {
-        buildingBlockScopes.push(matchingScopes[i]);
+module.exports = function(elementDefinitions, location) {
+  var matchingLocations = document.querySelectorAll('[data-location="' + location + '"]');
+  var domLocation;
+  var buildingBlockLocations = [];
+  for (var i=0; i<matchingLocations.length; i++) {
+    if (matchingLocations[i].tagName.toUpperCase() === 'SCRIPT') {
+      if (matchingLocations[i].getAttribute('type') === 'html/building-blocks') {
+        buildingBlockLocations.push(matchingLocations[i]);
       } else {
-        //ignore scopes declared in script tags that are not html/building-blocks
+        //ignore locations declared in script tags that are not html/building-blocks
       }
     } else {
-      if (domScope) {
-        throw "Only one '" + scope + "' scope can be present in the DOM at a time, except for building block scopes declared in script tags";
+      if (domLocation) {
+        throw "Only one '" + domLocation + "' location can be present in the DOM at a time, except for building block locations declared in script tags";
       } else {
-        domScope = matchingScopes[i];
+        domLocation = matchingLocations[i];
       }
     }
   }
@@ -190,26 +190,26 @@ module.exports = function(elementDefinitions, scope) {
     buildingBlocks: {}
   };
 
-  if (domScope) {
+  if (domLocation) {
     var bandicootLists = {};
     var bandicootElements = {};
     var bandicootObjects = {};
     var bandicootListToAddTo = bandicootListItemToAddTo = bandicootObjectToAddTo = undefined;
 
-    traverseElement(domScope, bandicootElements, bandicootLists, bandicootObjects, bandicootListToAddTo, bandicootListItemToAddTo, 
+    traverseElement(domLocation, bandicootElements, bandicootLists, bandicootObjects, bandicootListToAddTo, bandicootListItemToAddTo, 
       bandicootObjectToAddTo, elementDefinitions);
 
     mergeListsElementsAndObjects(result.dom, bandicootLists, bandicootElements, bandicootObjects);
   }
 
-  if (buildingBlockScopes.length > 0) {
+  if (buildingBlockLocations.length > 0) {
     var bandicootLists = {};
     var bandicootElements = {};
     var bandicootListToAddTo = bandicootListItemToAddTo = bandicootObjectToAddTo = undefined;
 
     var domParser = new DOMParser();
-    for (var i=0; i<buildingBlockScopes.length; i++) {
-      var parsedDom = domParser.parseFromString(buildingBlockScopes[i].text, "text/html");
+    for (var i=0; i<buildingBlockLocations.length; i++) {
+      var parsedDom = domParser.parseFromString(buildingBlockLocations[i].text, "text/html");
       traverseElement(parsedDom, bandicootElements, bandicootLists, bandicootObjects, bandicootListToAddTo, bandicootListItemToAddTo,
         bandicootObjectToAddTo, elementDefinitions);
     }

@@ -61,14 +61,14 @@ function jsElToDomEl(jsDomEl) {
   return newDomElement;
 }
 
-module.exports = function(scope, currentDomState, desiredDomState) {
+module.exports = function(location, currentDomState, desiredDomState) {
   var diffs = deepDiff.diff(currentDomState, desiredDomState, function(key, path) {
     return key === 'cloneDeep';
   });
   for (var i=0; i<diffs.length; i++) {
     var diff = diffs[i];
 
-    var domElement = document.body.querySelector('[data-scope="' + scope + '"]');
+    var domElement = document.body.querySelector('[data-location="' + location + '"]');
     var jsDomEl = desiredDomState;
     for (var j=0; j<diff.path.length; j++) {
       var partOfPath = diff.path[j];

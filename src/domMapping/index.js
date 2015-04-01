@@ -5,8 +5,8 @@ module.exports.build = function(strictTyping) {
   elementDefinitions[inputDefinition.tagName] = inputDefinition;
 
   return {
-    extractToVariables: function(scope) {
-      return require('./dom-extraction.js')(elementDefinitions, scope);
+    extractToVariables: function(location) {
+      return require('./dom-extraction.js')(elementDefinitions, location);
     },
     verifyTypes: require('./type-verification.js')
   };
