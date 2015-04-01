@@ -1,7 +1,8 @@
 var _ = require('lodash');
 
 function traverseElement(element, bandicootElements, bandicootLists, bandicootObjects,
-    bandicootListToAddTo, bandicootListItemToAddTo, bandicootObjectToAddTo, elementDefinitions) {
+    bandicootListToAddTo, bandicootListItemToAddTo, bandicootObjectToAddTo, elementDefinitions,
+    cloneDeepCustomizer) {
 
   if (_.isFunction(element.getAttribute)) {
     var dataName = element.getAttribute('data-name');
@@ -18,7 +19,7 @@ function traverseElement(element, bandicootElements, bandicootLists, bandicootOb
             dataType: dataType,
             dataName: dataName,
             cloneDeep: function() {
-              return _.cloneDeep(jsEl, require('./cloneDeep-customizer.js'));
+              return _.cloneDeep(jsEl, cloneDeepCustomizer);
             }
           };
           for (var i=0; i<element.attributes.length; i++) {
@@ -67,7 +68,7 @@ function traverseElement(element, bandicootElements, bandicootLists, bandicootOb
 
           bandicootListToAddTo = [];
           bandicootListToAddTo.cloneDeep = function() {
-            return _.cloneDeep(bandicootListToAddTo, require('./cloneDeep-customizer.js'));
+            return _.cloneDeep(bandicootListToAddTo, cloneDeepCustomizer);
           };
           bandicootListToAddTo.push = function(listItem) {
             if (listItem && listItem.dataType === 'object') {
@@ -107,7 +108,7 @@ function traverseElement(element, bandicootElements, bandicootLists, bandicootOb
             dataType: dataType,
             dataName: dataName,
             cloneDeep: function() {
-              return _.cloneDeep(bandicootListItemToAddTo, require('./cloneDeep-customizer.js'));
+              return _.cloneDeep(bandicootListItemToAddTo, cloneDeepCustomizer);
             }
           };
 
@@ -124,7 +125,7 @@ function traverseElement(element, bandicootElements, bandicootLists, bandicootOb
             dataType: dataType,
             dataName: dataName,
             cloneDeep: function() {
-              return _.cloneDeep(bandicootObjectToAddTo, require('./cloneDeep-customizer.js'));
+              return _.cloneDeep(bandicootObjectToAddTo, cloneDeepCustomizer);
             }
           };
 

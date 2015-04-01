@@ -1,10 +1,10 @@
 var deepDiff = require('deep-diff');
 var _ = require('lodash');
 
-module.exports.build = function() {
+module.exports.build = function(cloneDeep) {
   return {
     calculateDesiredDomState: function(currentDomState, domPatches) {
-      var domState = _.cloneDeep(currentDomState, require('../domMapping/cloneDeep-customizer.js'));
+      var domState = _.cloneDeep(currentDomState, cloneDeep.lodashCustomizer);
 
       var pathsBeingPatched = {};
       var pathCollision = undefined;

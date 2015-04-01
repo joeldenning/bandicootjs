@@ -37,7 +37,7 @@ module.exports = function(bandicoot, eventName) {
   Object.keys(possibleScenarios).forEach(function(possibleScenarioName) {
     var possibleScenario = possibleScenarios[possibleScenarioName];
 
-    var args = _.cloneDeep(scenarioArgs, require('../../domMapping/cloneDeep-customizer.js'));
+    var args = _.cloneDeep(scenarioArgs, bandicoot.library.cloneDeep.lodashCustomizer);
     var booleanExpressionResult;
     try {
       booleanExpressionResult = possibleScenario.condition.apply(args);
@@ -55,7 +55,7 @@ module.exports = function(bandicoot, eventName) {
   var atLeastOneScenarioSucceeded = false;
   scenariosToExecute.forEach(function(scenario) {
     try {
-      var args = _.cloneDeep(scenarioArgs, require('../../domMapping/cloneDeep-customizer.js'))
+      var args = _.cloneDeep(scenarioArgs, bandicoot.library.cloneDeep.lodashCustomizer);
       scenario.outcome.call(args);
       scenarioDomState[bandicoot.app.ScenarioPrototype.getFullyQualifiedName(scenario)] = args.dom;
       atLeastOneScenarioSucceeded = true;
