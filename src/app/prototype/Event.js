@@ -1,5 +1,5 @@
 module.exports = {
   getFullyQualifiedName: function(domEvent) {
-    return domEvent.where + '/' + domEvent.what;
+    return domEvent.location + '/' + domEvent.what;
   }
 };

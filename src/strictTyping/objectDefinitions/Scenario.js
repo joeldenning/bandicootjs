@@ -1,7 +1,7 @@
 module.exports = function(objectDefinitionBuilder) {
   var noSlashesPattern = /[^\/]/
   objectDefinitionBuilder.addProperty('outcome').withType('string').matchingPattern(noSlashesPattern);
-  objectDefinitionBuilder.addProperty('where').withType('string').matchingPattern(noSlashesPattern);
+  objectDefinitionBuilder.addProperty('location').withType('string').matchingPattern(noSlashesPattern);
   objectDefinitionBuilder.addProperty('what').withType('string').matchingPattern(noSlashesPattern);
   objectDefinitionBuilder.addProperty('when').withType('function');
   objectDefinitionBuilder.addProperty('how').withType('function');
@@ -10,7 +10,7 @@ module.exports = function(objectDefinitionBuilder) {
   objectDefinitionBuilder.addProperty('services').withType('array').whereEachElementIs('string').matchingPattern(/[^ ]/)
 
   objectDefinitionBuilder.requireProperty('outcome');
-  objectDefinitionBuilder.requireProperty('where');
+  objectDefinitionBuilder.requireProperty('location');
   objectDefinitionBuilder.requireProperty('what');
   objectDefinitionBuilder.requireProperty('when');
 };
