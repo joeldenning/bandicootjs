@@ -3,7 +3,7 @@ module.exports = function(objectDefinitionBuilder) {
   objectDefinitionBuilder.addProperty('outcome').withType('string').matchingPattern(noSlashesPattern);
   objectDefinitionBuilder.addProperty('where').withType('string').matchingPattern(noSlashesPattern);
   objectDefinitionBuilder.addProperty('what').withType('string').matchingPattern(noSlashesPattern);
-  objectDefinitionBuilder.addProperty('when').withType('conditionalExpressionString');
+  objectDefinitionBuilder.addProperty('when').withType('function');
   objectDefinitionBuilder.addProperty('how').withType('function');
   objectDefinitionBuilder.addProperty('domVariables').withType('object').whereEachPropertyIs('string').matchingPattern(/ul|li|div/)
   objectDefinitionBuilder.addProperty('domExamples').withType('object').whereEachPropertyIs('string').matchingPattern(/ul|li|div/)  

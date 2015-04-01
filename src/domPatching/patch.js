@@ -12,6 +12,8 @@ function setJsAttrAsDomAttr(key, value, domEl) {
       domEl.setAttribute('data-type', value);
     } else if (key === 'dataName') {
       domEl.setAttribute('data-name', value);
+    } else if (key === 'value') {
+      domEl.value = value;
     } else {
       domEl.setAttribute(key, value);
     }

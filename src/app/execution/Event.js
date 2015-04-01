@@ -1,5 +1,3 @@
-var evaluate = require('static-eval');
-var esprima = require('esprima');
 var _ = require('lodash');
 
 module.exports = function(bandicoot, eventName) {
@@ -38,11 +36,11 @@ module.exports = function(bandicoot, eventName) {
 
   Object.keys(possibleScenarios).forEach(function(possibleScenarioName) {
     var possibleScenario = possibleScenarios[possibleScenarioName];
-    var booleanExpression = esprima.parse(possibleScenario.when).body[0].expression;
 
+    var args = _.cloneDeep(scenarioArgs, require('../../domMapping/cloneDeep-customizer.js'));
     var booleanExpressionResult;
     try {
-      booleanExpressionResult = evaluate(booleanExpression, {}, scenarioArgs);
+      booleanExpressionResult = possibleScenario.when.apply(args);
     } catch (ex) {
       console.log("Scenario '" + bandicoot.app.EventPrototype.getFullyQualifiedName(possibleScenario) 
         + "' threw an error during evaluation of the 'when' expression -- " + ex.stack);

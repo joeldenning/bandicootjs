@@ -24,6 +24,9 @@ function traverseElement(element, bandicootElements, bandicootLists, bandicootOb
           for (var i=0; i<element.attributes.length; i++) {
             jsEl[element.attributes[i].nodeName] = element.attributes[i].value;
           }
+          if (element.value) {
+            jsEl.value = element.value;
+          }
           jsEl.tagName = element.tagName;
           if (elementDefinitions[element.tagName]) {
             var defn = elementDefinitions[element.tagName];
