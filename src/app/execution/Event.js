@@ -1,6 +1,6 @@
 var _ = require('lodash');
 
-module.exports = function(bandicoot, eventName) {
+module.exports = function(bandicoot, eventName, domArgs) {
   var event = bandicoot.library.slashNamespacing.getValueFromNamespacedObject(bandicoot.app.Events, eventName);
   if (!event) {
     throw "No such event '" + eventName + "' in bandicoot.app.Events object. Event names are of namespaced with slash (/) characters."; 
@@ -25,18 +25,40 @@ module.exports = function(bandicoot, eventName) {
     if (_.size(location.this.dom) > 0 && _.size(domVariables.dom) === 0) {
       throw "No location '" + location.location + "' was found in the dom";
     }
-    bandicoot.library.domMapping.verifyTypes(location.this.dom, location.types, domVariables.dom);
+    try {
+      bandicoot.library.domMapping.verifyTypes(location.this.dom, location.types, domVariables.dom);
+    } catch (ex) {
+      throw "Error mapping DOM location '" + location.location + "' to the javascript location of the same name -- " + ex;
+    }
   }
 
   if (location.this.buildingBlocks) {
     if (_.size(location.this.buildingBlocks) > 0 && _.size(domVariables.buildingBlocks) === 0) {
       throw "No location '" + location.location + "' was found in building blocks";
     }
-    bandicoot.library.domMapping.verifyTypes(location.this.buildingBlocks, location.types, domVariables.buildingBlocks);
+    try {
+      bandicoot.library.domMapping.verifyTypes(location.this.buildingBlocks, location.types, domVariables.buildingBlocks);
+    } catch (ex) {
+      throw "Error mapping building blocks for location '" + location.location + "' to the javascript location of the same name -- " + ex;
+    }
   }
 
   var scenarioArgs = {};
   _.assign(scenarioArgs, domVariables);
+
+  if (event.this) {
+    if (!domArgs) {
+      throw "The dom event arguments were not passed into the function -- cannot create 'this.event'";
+    }
+    scenarioArgs.event = {
+      source: bandicoot.library.domEvents.findDOMElFromDomArgs(domArgs, domVariables, location.location)
+    };
+    try {
+      bandicoot.library.domMapping.verifyTypes(event.this, undefined, scenarioArgs.event);
+    } catch (ex) {
+      "Error mapping the 'this' property for event '" + event.event + "' to the actual dom event -- " + ex;
+    }
+  }
 
   var scenariosToExecute = [];
 
@@ -55,6 +77,10 @@ module.exports = function(bandicoot, eventName) {
       scenariosToExecute.push(possibleScenario);
     }
   });
+
+  if (scenariosToExecute.length === 0) {
+    console.log("No scenario conditions were met");
+  }
 
   var scenarioDomState = {};
 

@@ -12,7 +12,11 @@ module.exports.build = function(bandicoot) {
   };
 
   bandicoot.Location = function(input) {
-    bandicoot.library.strictTyping.validateObjectIsOfType(input, 'Location');
+    try {
+      bandicoot.library.strictTyping.validateObjectIsOfType(input, 'Location');
+    } catch (ex) {
+      throw "Error creating Location with name '" + input.location + "': " + ex;
+    }
     var location = input;
     var fullyQualifiedName = bandicoot.app.LocationPrototype.getFullyQualifiedName(location);
     if (!_.isUndefined(bandicoot.app.Locations[fullyQualifiedName])) {
@@ -35,9 +39,9 @@ module.exports.build = function(bandicoot) {
     }
   }
 
-  bandicoot.Event = function(input) {
+  bandicoot.Event = function(input, domArgs) {
     if (isFunctionCall(input)) {
-      bandicoot.app.EventExecution(bandicoot, input);
+      bandicoot.app.EventExecution(bandicoot, input, domArgs);
     } else {
       bandicoot.library.strictTyping.validateObjectIsOfType(input, 'Event');
       var event = input;

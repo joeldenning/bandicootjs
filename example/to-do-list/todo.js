@@ -11,8 +11,10 @@ coot.Location({
   },
   types: {
     thingToDo: {
-      checkbox: 'element<input>',
-      label: 'element<label>'
+      item: {
+        checkbox: 'element<input>',
+        label: 'element<span>'
+      }
     }
   }
 });
@@ -20,6 +22,16 @@ coot.Location({
 coot.Event({
   location: 'To-do list',
   event: 'create new item'
+});
+
+coot.Event({
+  location: 'To-do list',
+  event: 'item checked',
+  this: {
+    event: {
+      source: 'element<input>'
+    } 
+  }
 })
 
 coot.Scenario({
@@ -30,11 +42,11 @@ coot.Scenario({
     return this.dom.newItemUserInput.value.length > 0;
   },
 	outcome: function() {
-		var newItem = this.buildingBlocks.thingToDo.cloneDeep();
-		delete newItem.checkbox.checked;
-		newItem.checkbox.value = this.dom.newItemUserInput.value;
-		newItem.label.innerHTML = this.dom.newItemUserInput.value;
-		this.dom.todoList.push(newItem);
+		var newThingToDo = this.buildingBlocks.thingToDo.cloneDeep();
+		delete newThingToDo.item.checkbox.checked;
+		newThingToDo.item.checkbox.value = this.dom.newItemUserInput.value;
+		newThingToDo.item.label.innerHTML = this.dom.newItemUserInput.value;
+		this.dom.todoList.push(newThingToDo);
 	}
 });
 
@@ -58,6 +70,6 @@ coot.Scenario({
     return true;
   },
   outcome: function() {
-
+    this.event.source.class.push('completed-item');
   }
 })

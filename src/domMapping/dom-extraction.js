@@ -1,8 +1,7 @@
 var _ = require('lodash');
 
-function traverseElement(element, bandicootElements, bandicootLists, bandicootObjects,
-    bandicootListToAddTo, bandicootListItemToAddTo, bandicootObjectToAddTo, elementDefinitions,
-    cloneDeepCustomizer) {
+function traverseElement(element, bandicootElements, bandicootLists,
+    bandicootListToAddTo, bandicootListItemToAddTo, bandicootObjectToAddTo) {
 
   if (_.isFunction(element.getAttribute)) {
     var dataName = element.getAttribute('data-name');
@@ -15,37 +14,9 @@ function traverseElement(element, bandicootElements, bandicootLists, bandicootOb
             throw 'element must have a data-name';
           }
 
-          var jsEl = {
-            dataType: dataType,
-            dataName: dataName,
-            cloneDeep: function() {
-              return _.cloneDeep(jsEl, cloneDeepCustomizer);
-            }
-          };
-          for (var i=0; i<element.attributes.length; i++) {
-            jsEl[element.attributes[i].nodeName] = element.attributes[i].value;
-          }
-          if (element.value) {
-            jsEl.value = element.value;
-          }
-          jsEl.tagName = element.tagName;
-          if (elementDefinitions[element.tagName]) {
-            var defn = elementDefinitions[element.tagName];
-            jsEl.tagName = defn.tagName;
-            for (var attributeName in defn.defaultAttributeValues) {
-              if (_.isUndefined(jsEl[attributeName])) {
-                var defaultValue = defn.defaultAttributeValues[attributeName];
-                switch (typeof defaultValue) {
-                  case 'string':
-                    jsEl[attributeName] = defaultValue;
-                  break;
-                  case 'function':
-                    jsEl[attributeName] = defaultValue(element);
-                  break;
-                }
-              }
-            }
-          }
+          var jsEl = require('./domEl-to-jsEl.js')(element);
+          jsEl.dataType = dataType;
+          jsEl.dataName = dataName;
 
           if (bandicootListItemToAddTo) {
             bandicootListItemToAddTo[dataName] = jsEl;
@@ -68,7 +39,7 @@ function traverseElement(element, bandicootElements, bandicootLists, bandicootOb
 
           bandicootListToAddTo = [];
           bandicootListToAddTo.cloneDeep = function() {
-            return _.cloneDeep(bandicootListToAddTo, cloneDeepCustomizer);
+            return _.cloneDeep(bandicootListToAddTo, require('./index.js').dependencies.cloneDeep.lodashCustomizer);
           };
           bandicootListToAddTo.push = function(listItem) {
             if (listItem && listItem.dataType === 'object') {
@@ -108,7 +79,7 @@ function traverseElement(element, bandicootElements, bandicootLists, bandicootOb
             dataType: dataType,
             dataName: dataName,
             cloneDeep: function() {
-              return _.cloneDeep(bandicootListItemToAddTo, cloneDeepCustomizer);
+              return _.cloneDeep(bandicootListItemToAddTo, require('./index.js').dependencies.cloneDeep.lodashCustomizer);
             }
           };
 
@@ -120,31 +91,32 @@ function traverseElement(element, bandicootElements, bandicootLists, bandicootOb
             throw 'list must have a data-name';
           }
 
-          bandicootObjectToAddTo = {
+          var newObject = {
             tagName: element.tagName,
             dataType: dataType,
             dataName: dataName,
             cloneDeep: function() {
-              return _.cloneDeep(bandicootObjectToAddTo, cloneDeepCustomizer);
+              return _.cloneDeep(newObject, require('./index.js').dependencies.cloneDeep.lodashCustomizer);
             }
           };
 
-          if (bandicootObjects[dataName]) {
+          if (bandicootObjectToAddTo[dataName]) {
             throw "Object named '" + dataName + "' already exists";
           }
 
-          bandicootObjects[dataName] = bandicootObjectToAddTo;
+          bandicootObjectToAddTo[dataName] = newObject;
+          bandicootObjectToAddTo = newObject;
         break;
 
         default:
-          throw "Unknown data-type '" + dataType + "'";
+          throw "Unknown data-type '" + dataType + "' in element '" + element.tagName + "'";
       }
     }
   }
 
   for (var i=0; i<element.childNodes.length; i++) {
-    traverseElement(element.childNodes[i], bandicootElements, bandicootLists, bandicootObjects,
-      bandicootListToAddTo, bandicootListItemToAddTo, bandicootObjectToAddTo, elementDefinitions);
+    traverseElement(element.childNodes[i], bandicootElements, bandicootLists,
+      bandicootListToAddTo, bandicootListItemToAddTo, bandicootObjectToAddTo);
   }
 };
 
@@ -166,7 +138,7 @@ function mergeListsElementsAndObjects(target, lists, elements, objects) {
   }
 }
 
-module.exports = function(elementDefinitions, location) {
+module.exports = function(location) {
   var matchingLocations = document.querySelectorAll('[data-location="' + location + '"]');
   var domLocation;
   var buildingBlockLocations = [];
@@ -195,10 +167,10 @@ module.exports = function(elementDefinitions, location) {
     var bandicootLists = {};
     var bandicootElements = {};
     var bandicootObjects = {};
-    var bandicootListToAddTo = bandicootListItemToAddTo = bandicootObjectToAddTo = undefined;
+    var bandicootListToAddTo = bandicootListItemToAddTo = undefined;
 
-    traverseElement(domLocation, bandicootElements, bandicootLists, bandicootObjects, bandicootListToAddTo, bandicootListItemToAddTo, 
-      bandicootObjectToAddTo, elementDefinitions);
+    traverseElement(domLocation, bandicootElements, bandicootLists, bandicootListToAddTo, bandicootListItemToAddTo, 
+      bandicootObjects);
 
     mergeListsElementsAndObjects(result.dom, bandicootLists, bandicootElements, bandicootObjects);
   }
@@ -206,13 +178,14 @@ module.exports = function(elementDefinitions, location) {
   if (buildingBlockLocations.length > 0) {
     var bandicootLists = {};
     var bandicootElements = {};
-    var bandicootListToAddTo = bandicootListItemToAddTo = bandicootObjectToAddTo = undefined;
+    var bandicootObjects = {};
+    var bandicootListToAddTo = bandicootListItemToAddTo = undefined;
 
     var domParser = new DOMParser();
     for (var i=0; i<buildingBlockLocations.length; i++) {
       var parsedDom = domParser.parseFromString(buildingBlockLocations[i].text, "text/html");
-      traverseElement(parsedDom, bandicootElements, bandicootLists, bandicootObjects, bandicootListToAddTo, bandicootListItemToAddTo,
-        bandicootObjectToAddTo, elementDefinitions);
+      traverseElement(parsedDom, bandicootElements, bandicootLists, bandicootListToAddTo, bandicootListItemToAddTo,
+        bandicootObjects);
     }
 
     mergeListsElementsAndObjects(result.buildingBlocks, bandicootLists, bandicootElements, bandicootObjects);
