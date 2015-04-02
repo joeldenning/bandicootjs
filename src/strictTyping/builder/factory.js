@@ -28,7 +28,7 @@ funcs.whereEachElementIs = function(property, elementType) {
   return property;
 }
 
-funcs.withType = function(property, type, arg) {
+function appendTypeProperties(property, type, arg) {
   switch(type) {
     case 'object':
       property.whereEachPropertyIs = lodash.bind(funcs.whereEachPropertyIs, null, property);
@@ -53,7 +53,20 @@ funcs.withType = function(property, type, arg) {
       throw 'When building property "' + property.name + '", there is no such type "' + type + '"';
     break;
   }
+}
+
+funcs.withType = function(property, type, arg) {
+  appendTypeProperties(property, type, arg);
   property.withType = type;
+  property.orWithType = function(type, arg) {
+    return funcs.orWithType(property, type, arg);
+  };
+  return property;
+}
+
+funcs.orWithType = function(property, type, arg) {
+  appendTypeProperties(property, type, arg);
+  property.orWithType = type;
   return property;
 }
 

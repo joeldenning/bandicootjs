@@ -8,7 +8,8 @@ module.exports.build = function() {
   bandicoot.library.slashNamespacing = require('./slashNamespacing/index.js').build();
   bandicoot.library.domElements = require('./domElements/index.js').build(bandicoot.library.strictTyping);
   bandicoot.library.domMapping = require('./domMapping/index.js').build(bandicoot.library.strictTyping,
-  	bandicoot.library.domElements);
+  	bandicoot.library.domElements, bandicoot.library.cloneDeep);
+  bandicoot.library.domEvents = require('./domEvents/index.js').build(bandicoot.library.domMapping);
   bandicoot.library.domPatching = require('./domPatching/index.js').build(bandicoot.library.cloneDeep);
   require('./app/index.js').build(bandicoot);
 

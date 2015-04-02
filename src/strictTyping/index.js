@@ -29,9 +29,11 @@ module.exports.build = function() {
     module.defineStrictlyTypedObject('EventVariables', require('../strictTyping/objectDefinitions/EventVariables.js'));
     module.defineStrictlyTypedObject('VariableTypeDefinitions', require('../strictTyping/objectDefinitions/VariableTypeDefinitions.js'));
     module.defineStrictlyTypedObject('Scenario', require('../strictTyping/objectDefinitions/Scenario.js'));
+    module.defineStrictlyTypedObject('EventContext', require('../strictTyping/objectDefinitions/EventContext.js'));
     module.defineStrictlyTypedObject('Event', require('../strictTyping/objectDefinitions/Event.js'));
     module.defineStrictlyTypedObject('DomElementDefinition', require('../strictTyping/objectDefinitions/DomElementDefinition.js'));
     module.defineStrictlyTypedObject('Location', require('../strictTyping/objectDefinitions/Location.js'));
+    module.defineStrictlyTypedObject('ThisDotEvent', require('../strictTyping/objectDefinitions/ThisDotEvent.js'));
     
     return module;
 }

@@ -19,6 +19,12 @@ function setJsAttrAsDomAttr(key, value, domEl) {
     }
   } else if (_.isFunction(value)) {
     return;
+  } else if (_.isArray(value)) {
+    if (key === 'class') {
+      domEl.class = value.join(" ");
+    } else {
+      throw "No support for patching dom attribute (of type array) called '" + key + "'";
+    }
   } else {
     var newEl = jsElToDomEl(value);
     newEl.setAttribute('data-name', key);
@@ -65,6 +71,10 @@ module.exports = function(location, currentDomState, desiredDomState) {
   var diffs = deepDiff.diff(currentDomState, desiredDomState, function(key, path) {
     return key === 'cloneDeep';
   });
+  if (_.isUndefined(diffs)) {
+    //nothing to do
+    return;
+  }
   for (var i=0; i<diffs.length; i++) {
     var diff = diffs[i];
 

@@ -2,16 +2,28 @@ var _ = require('lodash');
 
 function validateMapping(domMapping, customTypes, object) {
   for (var propertyName in domMapping) {
-    var propertyType = domMapping[propertyName];
-    validateProperty(propertyType, propertyName, object[propertyName], customTypes);
+    var property = domMapping[propertyName];
+    if (_.isUndefined(object)) {
+      throw "Cannot validate an undefined object";
+    }
+    if (_.isUndefined(object[propertyName])) {
+      throw "Object does not have property '" + propertyName + "'";
+    }
+    if (_.isString(property)) {
+      validateStringProperty(property, propertyName, object[propertyName], customTypes);
+    } else if (_.isPlainObject(property)) {
+      try {
+        validateMapping(property, customTypes, object[propertyName]);
+      } catch (ex) {
+        throw "Error while parsing property '" + propertyName + "': " + ex;
+      }
+    } else {
+      throw "Cannot parse properties of type '" + typeof property + "'";
+    }
   }
 };
 
-function validateProperty(propertyType, propertyName, propertyValue, customTypes) {
-  if (_.isUndefined(propertyValue)) {
-    throw "Required property '" + propertyName + "' is not present";
-  }
-
+function validateStringProperty(propertyType, propertyName, propertyValue, customTypes) {
   var elementMatches = propertyType.match(/element<.+>/);
   var listMatches = propertyType.match(/list<.+>/);
 
@@ -30,7 +42,7 @@ function validateProperty(propertyType, propertyName, propertyValue, customTypes
     var listItemsType = propertyType.substr(5, propertyType.length - 6);
     for (var i=0; i<propertyValue.length; i++) {
       try {
-        validateProperty(listItemsType, propertyName, propertyValue[i], customTypes);
+        validateStringProperty(listItemsType, propertyName, propertyValue[i], customTypes);
       } catch (ex) {
         throw "Invalid item in list '" + propertyName + "' -- " + ex;
       }

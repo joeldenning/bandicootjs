@@ -1,17 +1,20 @@
-var lodash = require('lodash');
+var _ = require('lodash');
 
-function validateProperty(property, object, otherTypes) {
-  switch(property.withType) {
+function validatePropertyToType(property, type, object, otherTypes) {
+  switch(type) {
     case 'object':
     break;
     case 'array':
     break;
     case 'string':
-      if (lodash.isRegExp(property.matchingPattern)) {
-        if (lodash.isUndefined(object[property.name])) {
+      if (_.isRegExp(property.matchingPattern)) {
+        if (_.isUndefined(object[property.name])) {
           throw 'Missing property "' + property.name + '"';
         }
         var string = object[property.name];
+        if (!_.isString(string)) {
+          throw "Property '" + property.name + "' is not a string";
+        }
         if (!string.match(property.matchingPattern)) {
           throw 'String property "' + property.name + '" does not match pattern "' + property.matchingPattern + '". Property value was ' + string;
         }
@@ -30,16 +33,35 @@ function validateProperty(property, object, otherTypes) {
       }
     break;
   }
+}
+
+function validateProperty(property, object, otherTypes) {
+  try {
+    validatePropertyToType(property, property.withType, object, otherTypes);
+  } catch(withTypeEx) {
+    if (property.orWithType) {
+      try {
+        validatePropertyToType(property, property.orWithType, object, otherTypes);
+      } catch (orWithTypeEx) {
+        throw property.name + " is neither of type '" + property.withType + "' (exception: " +
+          withTypeEx + "), nor of type '" + property.orWithType + "' (exception: " + orWithTypeEx + ")";
+      }
+    } else {
+      throw withTypeEx;
+    }
+  }
 };
 
 module.exports.validate = function(definition, object, otherTypes) {
   var keys = Object.keys(definition.properties);
   keys.forEach(function(key) {
     var property = definition.properties[key];
-    if (lodash.isUndefined(object[property.name]) && property.required === true) {
+    if (_.isUndefined(object[property.name]) && property.required === true) {
       throw 'Required property "' + property.name + '" is not present';
     }
-    validateProperty(property, object, otherTypes);    
+    if (property.required === true || object[key]) {
+      validateProperty(property, object, otherTypes); 
+    }   
   });
 
   if (definition.defaultProperty) {
@@ -48,7 +70,7 @@ module.exports.validate = function(definition, object, otherTypes) {
         var property = {
           name: objectKey
         };
-        lodash.assign(property, definition.defaultProperty);
+        _.assign(property, definition.defaultProperty);
         validateProperty(property, object, otherTypes);        
       }
     });
