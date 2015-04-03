@@ -63,49 +63,30 @@ function traverseElement(element, bandicootElements, bandicootLists,
         break;
 
         case 'list-item':
-          if (!dataName) {
-            throw 'list must have a data-name';
-          }
-          if (_.isUndefined(bandicootListToAddTo)) {
-            throw "Cannot add list-item '" + dataName + "' because there is no list to add to";
-          }
-
-          if (bandicootListItemToAddTo) {
-            throw "Cannot add a list item to a list item";
-          }
-
-          bandicootListItemToAddTo = {
-            tagName: element.tagName,
-            dataType: dataType,
-            dataName: dataName,
-            cloneDeep: function() {
-              return _.cloneDeep(bandicootListItemToAddTo, require('./index.js').dependencies.cloneDeep.lodashCustomizer);
-            }
-          };
-
-          bandicootListToAddTo.push(bandicootListItemToAddTo);
-        break;
-
         case 'object':
           if (!dataName) {
             throw 'list must have a data-name';
           }
 
-          var newObject = {
-            tagName: element.tagName,
-            dataType: dataType,
-            dataName: dataName,
-            cloneDeep: function() {
-              return _.cloneDeep(newObject, require('./index.js').dependencies.cloneDeep.lodashCustomizer);
-            }
+          var newObject = require('./domEl-to-jsEl.js')(element);
+          newObject.cloneDeep = function() {
+            return _.cloneDeep(newObject, require('./index.js').dependencies.cloneDeep.lodashCustomizer);
           };
 
-          if (bandicootObjectToAddTo[dataName]) {
-            throw "Object named '" + dataName + "' already exists";
+          if (bandicootListToAddTo) {
+            newObject.dataType = 'list-item';
+            bandicootListToAddTo.push(newObject);
+            bandicootListToAddTo = undefined;
+          } else {
+            if (bandicootObjectToAddTo[dataName]) {
+              throw "Object named '" + dataName + "' already exists";
+            }
+
+            newObject.dataType = 'object';
+            bandicootObjectToAddTo[dataName] = newObject;
           }
 
-          bandicootObjectToAddTo[dataName] = newObject;
-          bandicootObjectToAddTo = newObject;
+          bandicootObjectToAddTo = newObject; 
         break;
 
         default:

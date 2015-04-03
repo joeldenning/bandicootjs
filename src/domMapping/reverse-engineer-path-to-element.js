@@ -1,15 +1,36 @@
-module.exports = function(element, array) {
+function findIndexOfListItem(element) {
+  var i;
+  for (i=0; i<element.parentNode.children.length; i++) {
+    if (element === element.parentNode.children[i]) {
+      break;
+    }
+  }
+  return i;
+}
+
+function reverseEngineerPathToElement(element, pathArray) {
   var dataLocation = element.getAttribute('data-location');
   if (dataLocation) {
-    array.unshift(dataLocation);
+    pathArray.unshift(dataLocation);
     //once we hit the location element, we have traversed everything
     return;
   }
   var dataName = element.getAttribute('data-name');
   if (dataName) {
-    array.unshift(dataName);
-    reverseEngineerPathToElement(element.parentNode, array);
+    var dataType = element.getAttribute('data-type');
+    if (dataType === 'list-item') {
+      pathArray.unshift(findIndexOfListItem(element));
+    } else {
+      pathArray.unshift(dataName);
+    }
+    reverseEngineerPathToElement(element.parentNode, pathArray);
   } else {
     throw "Element '" + element.tagName + "' does not have a data-name attribute";
   }
+}
+
+module.exports = function(element) {
+  var pathArray = [];
+  reverseEngineerPathToElement(element, pathArray);
+  return pathArray;
 }

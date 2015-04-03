@@ -73,3 +73,5 @@ coot.Scenario({
     this.event.source.class.push('completed-item');
   }
 })
+
+coot.Event('To-do list/create new item');

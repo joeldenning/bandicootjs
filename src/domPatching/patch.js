@@ -1,19 +1,25 @@
 var _ = require('lodash');
 var deepDiff = require('deep-diff');
 
+var attributesThatAreNotAttributes = ['class', 'type', 'name', 'value', 'onclick', 'innerhtml']
+
 function setJsAttrAsDomAttr(key, value, domEl) {
   if (key === 'tagName') {
     //already encapsulated by the element type
     return;
   } else if (_.isNumber(value) || _.isString(value) || _.isBoolean(value)) {
-    if (key.toLowerCase() === 'innerhtml') {
-      domEl.innerHTML = value;
-    } else if (key === 'dataType') {
+    if (key === 'dataType' || key === 'data-type') {
       domEl.setAttribute('data-type', value);
-    } else if (key === 'dataName') {
+    } else if (key === 'dataName' || key === 'data-name') {
       domEl.setAttribute('data-name', value);
+    } else if (key === 'type') {
+      domEl.type = value;
+    } else if (key === 'name') {
+      domEl.name = value;
     } else if (key === 'value') {
       domEl.value = value;
+    } else if (key === 'innerHTML') {
+      domEl.innerHTML = value;
     } else {
       domEl.setAttribute(key, value);
     }
@@ -71,7 +77,7 @@ module.exports = function(location, currentDomState, desiredDomState) {
   var diffs = deepDiff.diff(currentDomState, desiredDomState, function(key, path) {
     return key === 'cloneDeep';
   });
-  if (_.isUndefined(diffs)) {
+  if (!diffs) {
     //nothing to do
     return;
   }
@@ -79,6 +85,7 @@ module.exports = function(location, currentDomState, desiredDomState) {
     var diff = diffs[i];
 
     var domElement = document.body.querySelector('[data-location="' + location + '"]');
+    var elementAttribute;
     var jsDomEl = desiredDomState;
     for (var j=0; j<diff.path.length; j++) {
       var partOfPath = diff.path[j];
@@ -100,30 +107,52 @@ module.exports = function(location, currentDomState, desiredDomState) {
           throw "could not find child";
         }
       } else {
-        domElement = domElement.querySelector('[data-name="' + partOfPath + '"]');
-        if (_.isUndefined(domElement)) {
-          throw "Could not find '" + diff.partOfPath + "'";
+        var newEl = domElement.querySelector('[data-name="' + partOfPath + '"]');
+        if (!newEl) {
+          if (j == diff.path.length - 1) {
+            elementAttribute = domElement.getAttribute(partOfPath) || domElement[partOfPath];
+            if (!_.isString(elementAttribute)) {
+              throw "Could not find '" + partOfPath + "'";              
+            }
+          } else {
+            throw "Could not find '" + partOfPath + "'";
+          }
+        } else {
+          domElement = newEl;
         }
       }
     }
     switch (diff.kind) {
       case 'A': //array
-        var domListItems = domElement.querySelectorAll('[data-type="list-item"]');
-        var index = diff.index;
-        switch (diff.item.kind) {
-          case 'N': //new item
-            var newDomElement = jsElToDomEl(jsDomEl[index]);
-            if (index === 0) {
-              domElement.appendChild(newDomElement);
-            } else {
-              if (domListItems.length < index - 1) {
-                throw 'dom state does not match expected';
+        if (_.isString(elementAttribute)) {
+          switch(diff.item.kind) {
+            case 'D': //a deleted item in the current dom is a new item in the desired dom
+              setJsAttrAsDomAttr(diff.path[diff.path.length - 1], diff.item.lhs, domElement);              
+            break;
+          }
+        } else if (domElement) {
+          var domListItems = domElement.querySelectorAll('[data-type="list-item"]');
+          var index = diff.index;
+          switch (diff.item.kind) {
+            case 'N': //new item
+              var newDomElement = jsElToDomEl(jsDomEl[index]);
+              if (index === 0) {
+                domElement.appendChild(newDomElement);
+              } else {
+                if (domListItems.length < index - 1) {
+                  throw 'dom state does not match expected';
+                }
+                domElement.insertBefore(newDomElement, domListItems[index]);
               }
-              domElement.insertBefore(newDomElement, domListItems[index]);
-            }
-          break;
+            break;
+          }
+        } else {
+          throw "Unknown dom patching failure";
         }
+      break;
 
+      default:
+        throw "Dom diff of kind '" + diff.kind + "' is not yet supported";
       break;
     }
   }
