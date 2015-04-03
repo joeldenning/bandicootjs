@@ -125,9 +125,16 @@ module.exports = function(location, currentDomState, desiredDomState) {
     switch (diff.kind) {
       case 'A': //array
         if (_.isString(elementAttribute)) {
+          var attrName = diff.path[diff.path.length - 1];
           switch(diff.item.kind) {
             case 'D': //a deleted item in the current dom is a new item in the desired dom
-              setJsAttrAsDomAttr(diff.path[diff.path.length - 1], diff.item.lhs, domElement);              
+              setJsAttrAsDomAttr(attrName, diff.item.lhs, domElement);              
+            break;
+            case 'N': //a new item in the current dom means that it is deleted in the desired dom
+              setJsAttrAsDomAttr(attrName, elementAttribute.replace(diff.item.rhs, ''), domElement);
+            break;
+            default:
+              throw "diff kind N with item.kind '" + diff.item.kind + "' is not yet supported";
             break;
           }
         } else if (domElement) {
@@ -144,6 +151,9 @@ module.exports = function(location, currentDomState, desiredDomState) {
                 }
                 domElement.insertBefore(newDomElement, domListItems[index]);
               }
+            break;
+            default:
+              throw "diff kind N with item.kind '" + diff.item.kind + "' is not yet supported";
             break;
           }
         } else {

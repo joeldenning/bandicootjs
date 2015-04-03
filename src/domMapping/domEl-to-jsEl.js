@@ -44,5 +44,9 @@ module.exports = function(element) {
     jsEl.class = []
   }
 
+  if (!_.isUndefined(element.checked)) {
+    jsEl.checked = element.checked;
+  }
+
   return jsEl;
 };
