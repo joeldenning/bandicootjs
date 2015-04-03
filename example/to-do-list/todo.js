@@ -35,19 +35,19 @@ coot.Event({
 })
 
 coot.Scenario({
-	location: 'To-do list',
-	event: 'create new item',
+  location: 'To-do list',
+  event: 'create new item',
   scenario: 'add new row to bulleted list',
-	condition: function() {
+  condition: function() {
     return this.dom.newItemUserInput.value.length > 0;
   },
-	outcome: function() {
-		var newThingToDo = this.buildingBlocks.thingToDo.cloneDeep();
-		delete newThingToDo.item.checkbox.checked;
-		newThingToDo.item.checkbox.value = this.dom.newItemUserInput.value;
-		newThingToDo.item.label.innerHTML = this.dom.newItemUserInput.value;
-		this.dom.todoList.push(newThingToDo);
-	}
+  outcome: function() {
+    var newThingToDo = this.buildingBlocks.thingToDo.cloneDeep();
+    delete newThingToDo.item.checkbox.checked;
+    newThingToDo.item.checkbox.value = this.dom.newItemUserInput.value;
+    newThingToDo.item.label.innerHTML = this.dom.newItemUserInput.value;
+    this.dom.todoList.push(newThingToDo);
+  }
 });
 
 coot.Scenario({

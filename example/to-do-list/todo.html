@@ -2,6 +2,9 @@
   <script type="text/javascript" src="/bandicootjs/dist/bandicoot.js"></script>
   <link rel="stylesheet" type="text/css" href="/bandicootjs/example/to-do-list/todo.css"></link>
 
+  <!-- Twitter bootstrap to make this look at least somewhat respectable -->
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"> -->
+
   <script type="html/building-blocks" data-location="To-do list">
     <li data-type="list-item" data-name="thingToDo">
       <label data-type="object" data-name="item" onclick="coot.Event('To-do list/toggle item checked', arguments)">
@@ -14,10 +17,10 @@
 
 <body>
   <div data-location="To-do list">
-    <ul data-type="list" data-name="todoList" style="list-style-type: none">
-    </ul>
     <input data-type="element" data-name="newItemUserInput" type="text" placeholder="A new thing to do" value="Say hello">
     <button onclick="coot.Event('To-do list/create new item', arguments)">Add thing to do</button>
+    <ul data-type="list" data-name="todoList" style="list-style-type: none">
+    </ul>
   </div>
 
   <script type="text/javascript" src="/bandicootjs/example/to-do-list/todo.js"></script>
