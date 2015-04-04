@@ -1,7 +1,12 @@
 var deepDiff = require('deep-diff');
 var _ = require('lodash');
 
-module.exports.build = function(cloneDeep) {
+module.exports.build = function(cloneDeep, domMapping) {
+  module.exports.dependencies = {
+    'cloneDeep': cloneDeep,
+    'domMapping': domMapping
+  }
+
   return {
     calculateDesiredDomState: function(currentDomState, domPatches) {
       var domState = _.cloneDeep(currentDomState, cloneDeep.lodashCustomizer);

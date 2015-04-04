@@ -8,7 +8,7 @@
   <script type="html/building-blocks" data-location="To-do list">
     <li data-type="list-item" data-name="thingToDo">
       <label data-type="object" data-name="item" onclick="coot.Event('To-do list/toggle item checked', arguments)">
-        <input data-type="element" data-name="checkbox" type="checkbox" name="to-do-list" value="soft-soap">
+        <input data-type="element" data-name="checkbox" type="checkbox" name="to-do-list">
         <span data-type="element" data-name="label"></span>
       </label>
     </li>
@@ -16,8 +16,8 @@
 </head>
 
 <body>
-  <div data-location="To-do list">
-    <input data-type="element" data-name="newItemUserInput" type="text" placeholder="A new thing to do" value="Say hello">
+  <div data-location="To-do list" class="horizontal-center">
+    <input data-type="element" data-name="newItemUserInput" type="text" placeholder="A new thing to do" value="say hello">
     <button onclick="coot.Event('To-do list/create new item', arguments)">Add thing to do</button>
     <ul data-type="list" data-name="todoList" style="list-style-type: none">
     </ul>

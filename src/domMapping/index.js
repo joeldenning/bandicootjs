@@ -13,6 +13,7 @@ module.exports.build = function(strictTyping, domElements, cloneDeep) {
     verifyTypes: require('./type-verification.js'),
     domElToJsEl: require('./domEl-to-jsEl.js'),
     reverseEngineerPathToElement: require('./reverse-engineer-path-to-element.js'),
-    getJSElFromPath: require('./getJSElFromPath.js')
+    getJSElFromPath: require('./getJSElFromPath.js'),
+    transferAttrFromDomElToObj: require('./transferAttrFromDomElToObj.js')
   };
 };

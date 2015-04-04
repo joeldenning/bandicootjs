@@ -55,7 +55,7 @@ coot.Scenario({
   event: 'create new item',
   scenario: 'warn the user that the item will not be added to the list',
   condition: function() {
-    this.dom.newItemUserInput.value.length === 0
+    return this.dom.newItemUserInput.value.length === 0;
   },
   outcome: function() {
     alert('I am sorry but you can\'t add an item full of whitespace characters');

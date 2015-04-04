@@ -11,7 +11,8 @@ module.exports.build = function() {
   bandicoot.library.domMapping = require('./domMapping/index.js').build(bandicoot.library.strictTyping,
   	bandicoot.library.domElements, bandicoot.library.cloneDeep);
   bandicoot.library.domEvents = require('./domEvents/index.js').build(bandicoot.library.domMapping);
-  bandicoot.library.domPatching = require('./domPatching/index.js').build(bandicoot.library.cloneDeep);
+  bandicoot.library.domPatching = require('./domPatching/index.js').build(
+    bandicoot.library.cloneDeep, bandicoot.library.domMapping);
 
   var appProperties = require('./app/index.js').build(
     bandicoot.library.cloneDeep,

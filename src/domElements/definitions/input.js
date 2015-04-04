@@ -2,6 +2,7 @@ module.exports = {
   tagName: 'INPUT',
   defaultAttributeValues: {
     name: '',
-    type: 'text'
+    type: 'text',
+    value: ''
   }
 };

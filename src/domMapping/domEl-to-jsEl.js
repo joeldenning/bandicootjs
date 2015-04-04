@@ -2,6 +2,7 @@ var _ = require('lodash');
 
 module.exports = function(element) {
   var domElements = require('./index.js').dependencies.domElements;
+  var transferAttrFromDomElToObj = require('./transferAttrFromDomElToObj.js');
 
   var jsEl = {
     cloneDeep: function() {
@@ -9,14 +10,7 @@ module.exports = function(element) {
     }
   };
   for (var i=0; i<element.attributes.length; i++) {
-    switch(element.attributes[i].nodeName) {
-      case 'class':
-        jsEl.class = element.attributes[i].value.split(/ +/);
-      break;
-      default:
-        jsEl[element.attributes[i].nodeName] = element.attributes[i].value;
-      break;
-    }
+    transferAttrFromDomElToObj(element, element.attributes[i].name, jsEl);
   }
   if (element.value) {
     jsEl.value = element.value;

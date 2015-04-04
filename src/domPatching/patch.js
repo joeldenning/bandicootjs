@@ -27,7 +27,7 @@ function setJsAttrAsDomAttr(key, value, domEl) {
     return;
   } else if (_.isArray(value)) {
     if (key === 'class') {
-      domEl.class = value.join(" ");
+      domEl.className = value.join(" ");
     } else {
       throw "No support for patching dom attribute (of type array) called '" + key + "'";
     }
@@ -74,6 +74,8 @@ function jsElToDomEl(jsDomEl) {
 }
 
 module.exports = function(location, currentDomState, desiredDomState) {
+  var domPatching = require('./index.js');
+
   var diffs = deepDiff.diff(currentDomState, desiredDomState, function(key, path) {
     return key === 'cloneDeep';
   });
@@ -108,30 +110,38 @@ module.exports = function(location, currentDomState, desiredDomState) {
         }
       } else {
         var newEl = domElement.querySelector('[data-name="' + partOfPath + '"]');
-        if (!newEl) {
+        if (newEl) {
+          domElement = newEl;
+        } else {
           if (j == diff.path.length - 1) {
-            elementAttribute = domElement.getAttribute(partOfPath) || domElement[partOfPath];
-            if (!_.isString(elementAttribute)) {
-              throw "Could not find '" + partOfPath + "'";              
-            }
+            elementAttribute = domPatching.dependencies.domMapping.transferAttrFromDomElToObj(domElement, partOfPath);
           } else {
             throw "Could not find '" + partOfPath + "'";
           }
-        } else {
-          domElement = newEl;
         }
       }
     }
+
     switch (diff.kind) {
       case 'A': //array
-        if (_.isString(elementAttribute)) {
+        if (elementAttribute) {
           var attrName = diff.path[diff.path.length - 1];
           switch(diff.item.kind) {
             case 'D': //a deleted item in the current dom is a new item in the desired dom
               setJsAttrAsDomAttr(attrName, diff.item.lhs, domElement);              
             break;
             case 'N': //a new item in the current dom means that it is deleted in the desired dom
-              setJsAttrAsDomAttr(attrName, elementAttribute.replace(diff.item.rhs, ''), domElement);
+              if (_.isArray(elementAttribute)) {
+                var indexToRemove = elementAttribute.indexOf(diff.item.rhs);
+                if (indexToRemove >= 0) {
+                  elementAttribute.splice(indexToRemove, 1);
+                  setJsAttrAsDomAttr(attrName, elementAttribute, domElement);
+                }
+              } else if (_.isString(elementAttribute)) {
+                setJsAttrAsDomAttr(attrName, elementAttribute.replace(diff.item.rhs, ''), domElement);
+              } else {
+                throw "element attribute '" + attrName + "' of type '" + typeof elementAttribute + "' is not supported";
+              }
             break;
             default:
               throw "diff kind N with item.kind '" + diff.item.kind + "' is not yet supported";
