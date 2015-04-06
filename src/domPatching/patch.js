@@ -1,8 +1,6 @@
 var _ = require('lodash');
 var deepDiff = require('deep-diff');
 
-var attributesThatAreNotAttributes = ['class', 'type', 'name', 'value', 'onclick', 'innerhtml']
-
 function setJsAttrAsDomAttr(key, value, domEl) {
   if (key === 'tagName') {
     //already encapsulated by the element type
@@ -18,8 +16,21 @@ function setJsAttrAsDomAttr(key, value, domEl) {
       domEl.name = value;
     } else if (key === 'value') {
       domEl.value = value;
-    } else if (key === 'innerHTML') {
-      domEl.innerHTML = value;
+    } else if (key === 'checked') {
+      if (value) {
+        domEl.checked = true;
+      } else {
+        domEl.checked = false;
+      }
+      domEl.removeAttribute('checked');
+    } else if (key === 'text') {
+      for (var i=0; i<domEl.childNodes.length; i++) {
+        if (domEl.childNodes[i].nodeType === 3) {
+          domEl.childNodes[i].remove();  
+        }
+      }
+      var textNode = document.createTextNode(value);
+      domEl.insertBefore(textNode, domEl.firstChild);
     } else {
       domEl.setAttribute(key, value);
     }
@@ -83,15 +94,25 @@ module.exports = function(location, currentDomState, desiredDomState) {
     //nothing to do
     return;
   }
+
+  var domOperationsToPerform = [];
+  var elementAttribute, attrName;
+
   for (var i=0; i<diffs.length; i++) {
     var diff = diffs[i];
 
     var domElement = document.body.querySelector('[data-location="' + location + '"]');
-    var elementAttribute;
     var jsDomEl = desiredDomState;
-    for (var j=0; j<diff.path.length; j++) {
+    var continueSearching = true;
+    elementAttribute = undefined;
+    attrName = undefined;
+    for (var j=0; j<diff.path.length && continueSearching; j++) {
       var partOfPath = diff.path[j];
       jsDomEl = jsDomEl[partOfPath];
+      if (_.isFunction(jsDomEl)) {
+        //we don't patch dom functions
+        continue;
+      }
       var searchIndex = _.parseInt(partOfPath);
       if (!isNaN(searchIndex)) {
         //get the list item corresponding to this number
@@ -113,38 +134,56 @@ module.exports = function(location, currentDomState, desiredDomState) {
         if (newEl) {
           domElement = newEl;
         } else {
-          if (j == diff.path.length - 1) {
-            elementAttribute = domPatching.dependencies.domMapping.transferAttrFromDomElToObj(domElement, partOfPath);
-          } else {
-            throw "Could not find '" + partOfPath + "'";
+          elementAttribute = domPatching.dependencies.domMapping.transferAttrFromDomElToObj(domElement, partOfPath);
+          if (elementAttribute) {
+            continueSearching = false;
+            attrName = partOfPath;
           }
         }
       }
     }
 
+    var patchSupported = false;
+    var errorMsg = '';
     switch (diff.kind) {
       case 'A': //array
         if (elementAttribute) {
-          var attrName = diff.path[diff.path.length - 1];
           switch(diff.item.kind) {
             case 'D': //a deleted item in the current dom is a new item in the desired dom
-              setJsAttrAsDomAttr(attrName, diff.item.lhs, domElement);              
+              if (diff.item.lhs) {
+                domOperationsToPerform.push({
+                  type: 'setJsAttrAsDomAttr',
+                  attrName: attrName,
+                  attrValue: diff.item.lhs,
+                  element: domElement
+                });
+                patchSupported = true;
+              }            
             break;
             case 'N': //a new item in the current dom means that it is deleted in the desired dom
               if (_.isArray(elementAttribute)) {
                 var indexToRemove = elementAttribute.indexOf(diff.item.rhs);
                 if (indexToRemove >= 0) {
                   elementAttribute.splice(indexToRemove, 1);
-                  setJsAttrAsDomAttr(attrName, elementAttribute, domElement);
+                  domOperationsToPerform.push({
+                    type: 'setJsAttrAsDomAttr',
+                    attrName: attrName,
+                    attrValue: elementAttribute,
+                    element: domElement
+                  })
+                  patchSupported = true;            
+                } else {
+                  errorMsg = 'could not find existing dom attribute ' + elementAttribute;
                 }
               } else if (_.isString(elementAttribute)) {
-                setJsAttrAsDomAttr(attrName, elementAttribute.replace(diff.item.rhs, ''), domElement);
-              } else {
-                throw "element attribute '" + attrName + "' of type '" + typeof elementAttribute + "' is not supported";
+                domOperationsToPerform.push({
+                  type: 'setJsAttrAsDomAttr',
+                  attrName: attrName,
+                  attrValue: elementAttribute.replace(diff.item.rhs, ''),
+                  element: domElement
+                });
+                patchSupported = true;            
               }
-            break;
-            default:
-              throw "diff kind N with item.kind '" + diff.item.kind + "' is not yet supported";
             break;
           }
         } else if (domElement) {
@@ -154,26 +193,87 @@ module.exports = function(location, currentDomState, desiredDomState) {
             case 'N': //new item
               var newDomElement = jsElToDomEl(jsDomEl[index]);
               if (index === 0) {
-                domElement.appendChild(newDomElement);
+                domOperationsToPerform.push({
+                  type: 'appendChild',
+                  parent: domElement,
+                  child: newDomElement
+                })
+                patchSupported = true;
               } else {
                 if (domListItems.length < index - 1) {
-                  throw 'dom state does not match expected';
+                  errorMsg = 'dom state does not match expected';
+                } else {
+                  domOperationsToPerform.push({
+                    type: 'insertBefore',
+                    parent: domElement,
+                    child: domListItems[index],
+                    newElement: newDomElement
+                  });
+                  patchSupported = true;            
                 }
-                domElement.insertBefore(newDomElement, domListItems[index]);
               }
             break;
-            default:
-              throw "diff kind N with item.kind '" + diff.item.kind + "' is not yet supported";
+            case 'D': //deleted item
+              if (diff.item.lhs) {
+                domOperationsToPerform.push({
+                  type: 'remove',
+                  element: domListItems[index]
+                });
+                patchSupported = true;            
+              }
             break;
           }
-        } else {
-          throw "Unknown dom patching failure";
         }
       break;
-
-      default:
-        throw "Dom diff of kind '" + diff.kind + "' is not yet supported";
+      case 'E': //edit
+        if (_.isFunction(diff.rhs) || _.isFunction(diff.lhs)) {
+          //we don't ever patch any functions, so this patch is supported
+          patchSupported = true;
+        } else {
+          if (elementAttribute) {
+            domOperationsToPerform.push({
+              type: 'setJsAttrAsDomAttr',
+              attrName: attrName,
+              attrValue: diff.rhs,
+              element: domElement
+            });
+            patchSupported = true;
+          }
+        }
       break;
     }
+
+    if (!patchSupported) {
+      console.log("domElement = ")
+      console.dir(domElement);
+      console.log("attrName = " + attrName);
+      console.log("element attribute = ")
+      console.dir(elementAttribute)
+      console.log("diff = ")
+      console.dir(diff);
+      var diffItemKind = diff.item ? diff.item.kind : null;
+      throw "Unsupported dom patch operation -- diff.kind = " + diff.kind 
+        + ", diff.item.kind = " + diffItemKind + ", errorMsg = " + errorMsg;
+    }
   }
+
+  domOperationsToPerform.forEach(function(domOperationToPerform) {
+    switch (domOperationToPerform.type) {
+      case 'setJsAttrAsDomAttr':
+        setJsAttrAsDomAttr(domOperationToPerform.attrName, domOperationToPerform.attrValue, domOperationToPerform.element);
+      break;
+      case 'appendChild':
+        domOperationToPerform.parent.appendChild(domOperationToPerform.child);
+      break;
+      case 'remove':
+        domOperationToPerform.element.remove();
+      break;
+      case 'insertBefore':
+        domOperationToPerform.parent.insertBefore(domOperationToPerform.newElement, domOperationToPerform.child);
+      break;
+      default:
+        throw "Unsupported dom patch operation of type '" + domOperationToPerform.type + "'";
+      break;
+    }
+  });
 }

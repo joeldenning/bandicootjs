@@ -14,6 +14,17 @@ module.exports = function(element, attrName, targetObject) {
     case 'value':
       value = targetObject.value = element.value;
     break;
+    case 'checked':
+      value = targetObject.checked = element.checked;
+    break;
+    case 'text':
+      var text = require('./parseTextAttribute.js')(element);
+      if (text.trim().length > 0) {
+        value = targetObject.text = text;
+      } else {
+        value = undefined;
+      }
+    break;
     default:
       value = targetObject[_.camelCase(attrName)] = element.getAttribute(attrName);
     break;

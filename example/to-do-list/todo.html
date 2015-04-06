@@ -17,9 +17,10 @@
 
 <body>
   <div data-location="To-do list" class="horizontal-center">
-    <input data-type="element" data-name="newItemUserInput" type="text" placeholder="A new thing to do" value="say hello">
+    <input data-type="element" data-name="newItemUserInput" type="text" placeholder="A new thing to do" value="say hello" id="newItem">
     <button onclick="coot.Event('To-do list/create new item', arguments)">Add thing to do</button>
-    <ul data-type="list" data-name="todoList" style="list-style-type: none">
+    <button onclick="coot.Event('To-do list/clear selected', arguments)">Remove selected</button>
+    <ul data-type="list" data-name="todoList" style="list-style-type: none" id="list">
     </ul>
   </div>
 
