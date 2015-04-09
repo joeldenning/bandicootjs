@@ -1,6 +1,6 @@
-var objectDefinitionBuilderFactory = require('../strictTyping/builder/factory.js');
-
 module.exports.build = function() {
+    var objectDefinitionBuilderFactory = require('../strictTyping/builder/factory.js');
+    
     var module = {
         objectDefinitions: {},
         defineStrictlyTypedObject: function(name, objectDefinitionFactory) {

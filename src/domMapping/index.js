@@ -1,15 +1,6 @@
-
-module.exports.build = function(strictTyping, domElements, cloneDeep) {
-  module.exports.dependencies = {
-    'strictTyping': strictTyping,
-    'domElements': domElements,
-    'cloneDeep': cloneDeep
-  };
-
+module.exports.build = function() {
   return {
-    extractToVariables: function(location) {
-      return require('./dom-extraction.js')(location, cloneDeep);
-    },
+    extractToVariables: require('./dom-extraction.js'),
     verifyTypes: require('./type-verification.js'),
     domElToJsEl: require('./domEl-to-jsEl.js'),
     reverseEngineerPathToElement: require('./reverse-engineer-path-to-element.js'),

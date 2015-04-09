@@ -1,4 +1,4 @@
-var lodash = require('lodash');
+var _ = require('../index.js').dependencies.lodash;
 
 var funcs = {};
 
@@ -31,20 +31,20 @@ funcs.whereEachElementIs = function(property, elementType) {
 function appendTypeProperties(property, type, arg) {
   switch(type) {
     case 'object':
-      property.whereEachPropertyIs = lodash.bind(funcs.whereEachPropertyIs, null, property);
+      property.whereEachPropertyIs = _.bind(funcs.whereEachPropertyIs, null, property);
     break;
     case 'array':
-      property.whereEachElementIs = lodash.bind(funcs.whereEachElementIs, null, property);
+      property.whereEachElementIs = _.bind(funcs.whereEachElementIs, null, property);
     break;
     case 'string':
-      property.matchingPattern = lodash.bind(funcs.matchingPattern, null, property);
+      property.matchingPattern = _.bind(funcs.matchingPattern, null, property);
     break;
     case 'conditionalExpressionString':
     break;
     case 'function':
     break;
     case 'strictlyTypedObject':
-      if (lodash.isUndefined(arg) || !lodash.isString(arg)) {
+      if (_.isUndefined(arg) || !_.isString(arg)) {
         throw 'When building property "' + property.name + '" of type "strictlyTypedObject", you must provide an additional argument specifying which strictlyTypedObject';
       }
       property.strictlyTypedObject = arg;
@@ -89,7 +89,7 @@ module.exports = {
         return property;
       },
       requireProperty: function(name) {
-        if (!lodash.isPlainObject(builder.properties[name])) {
+        if (!_.isPlainObject(builder.properties[name])) {
           throw 'Cannot require property "' + name + '" because no such property exists';
         }
         builder.properties[name].required = true;
@@ -118,12 +118,12 @@ module.exports = {
       build: function() {
         var builtProperties = {};
         var customizer = function(objectValue, sourceValue) {
-          return lodash.isFunction(sourceValue) ? undefined : sourceValue;
+          return _.isFunction(sourceValue) ? undefined : sourceValue;
         };
-        lodash.assign(builtProperties, builder.properties, customizer);
+        _.assign(builtProperties, builder.properties, customizer);
 
         var builtDefaultProperty = {};
-        lodash.assign(builtDefaultProperty, builder.defaultProperty, customizer);
+        _.assign(builtDefaultProperty, builder.defaultProperty, customizer);
         return {
           properties: builtProperties,
           defaultProperty: builtDefaultProperty

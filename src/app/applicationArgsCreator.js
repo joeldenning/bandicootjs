@@ -1,9 +1,6 @@
-var _ = require('lodash');
-
 module.exports = function(domVariables, eventSourcePath, eventSourceDomElement) {
   var app = require('./index.js');
-
-  var args = _.cloneDeep(domVariables, app.dependencies.cloneDeep.lodashCustomizer);
+  var args = app.dependencies.cloneDeep(domVariables);
   if (eventSourceDomElement) {
     args.event = {};
     try {

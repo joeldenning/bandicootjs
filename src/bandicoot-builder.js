@@ -1,30 +1,41 @@
 module.exports.build = function() {
+  var framework = {};
+  var app = {};
   var bandicoot = {
-    library: {}
+    app: app,
+    framework: framework
   };
 
-  bandicoot.library.lodash = require('lodash');
-  bandicoot.library.cloneDeep = require('./cloneDeep/index.js').build();
-  bandicoot.library.strictTyping = require('./strictTyping/index.js').build();
-  bandicoot.library.slashNamespacing = require('./slashNamespacing/index.js').build();
-  bandicoot.library.domElements = require('./domElements/index.js').build(bandicoot.library.strictTyping);
-  bandicoot.library.domMapping = require('./domMapping/index.js').build(bandicoot.library.strictTyping,
-  	bandicoot.library.domElements, bandicoot.library.cloneDeep);
-  bandicoot.library.domEvents = require('./domEvents/index.js').build(bandicoot.library.domMapping);
-  bandicoot.library.domPatching = require('./domPatching/index.js').build(
-    bandicoot.library.cloneDeep, bandicoot.library.domMapping);
+  function injectDependencies(targetObject, depNames) {
+    targetObject.dependencies = [];
+    depNames.forEach(function(depName) {
+      targetObject.dependencies[depName] = framework[depName];
+    });
+  }
 
-  var appProperties = require('./app/index.js').build(
-    bandicoot.library.cloneDeep,
-    bandicoot.library.domElements,
-    bandicoot.library.domEvents,
-    bandicoot.library.domMapping,
-    bandicoot.library.domPatching,
-    bandicoot.library.slashNamespacing,
-    bandicoot.library.strictTyping
-  );
+  function buildModule(moduleName, unbuiltModule, moduleDependencies) {
+    injectDependencies(unbuiltModule, moduleDependencies);
+    framework[moduleName] = unbuiltModule.build();    
+  }
 
-  bandicoot.library.lodash.assign(bandicoot, appProperties);
+  //build modules
+  framework.lodash = require('lodash');
+  framework.deepDiff = require('deep-diff');
+  buildModule('cloneDeep', require('./cloneDeep/index.js'), ['lodash']);
+  buildModule('strictTyping', require('./strictTyping/index.js'), ['lodash']);
+  buildModule('slashNamespacing', require('./slashNamespacing/index.js'), ['lodash']);
+  buildModule('domEvents', require('./domEvents/index.js'), ['lodash']);
+  buildModule('domElements', require('./domElements/index.js'), ['strictTyping', 'lodash']);
+  buildModule('domMapping', require('./domMapping/index.js'), ['lodash', 'strictTyping', 'domElements', 'cloneDeep']);
+  buildModule('domPatching', require('./domPatching/index.js'), ['lodash', 'deepDiff', 'cloneDeep', 'domMapping', 'cloneDeep']);
+
+  //now build the app
+  var unbuiltApp = require('./app/index.js');
+  injectDependencies(unbuiltApp, ['cloneDeep', 'domElements', 'domEvents', 'domMapping', 
+    'domPatching', 'slashNamespacing', 'strictTyping', 'lodash']);
+  var builtApp = unbuiltApp.build();
+
+  framework.lodash.assign(bandicoot, builtApp);
 
   return bandicoot;
 }

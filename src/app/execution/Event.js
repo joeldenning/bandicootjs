@@ -1,4 +1,4 @@
-var _ = require('lodash');
+var _ = require('../index.js').dependencies.lodash;
 
 module.exports = function(input, domArgs) {
   var EventPrototype = require('../prototype/Event.js');

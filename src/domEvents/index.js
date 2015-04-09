@@ -1,4 +1,4 @@
-module.exports.build = function(domMapping) {
+module.exports.build = function() {
   return {
     getEventSourceDomElement: function(domArgs) {
       return domArgs[0].currentTarget;

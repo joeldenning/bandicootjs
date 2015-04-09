@@ -1,7 +1,7 @@
-module.exports.build = function(strictTyping) {
+module.exports.build = function() {
   var elementDefinitions = {};
   var inputDefinition = require('./definitions/input.js');
-  strictTyping.validateObjectIsOfType(inputDefinition, 'DomElementDefinition');
+  module.exports.dependencies.strictTyping.validateObjectIsOfType(inputDefinition, 'DomElementDefinition');
   elementDefinitions[inputDefinition.tagName] = inputDefinition;
   return elementDefinitions;
 }

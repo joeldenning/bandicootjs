@@ -1,13 +1,11 @@
-var _ = require('lodash');
+var _ = require('./index.js').dependencies.lodash;
 
 module.exports = function(element) {
   var domElements = require('./index.js').dependencies.domElements;
   var transferAttrFromDomElToObj = require('./transferAttrFromDomElToObj.js');
 
   var jsEl = {
-    cloneDeep: function() {
-      return _.cloneDeep(jsEl, cloneDeepCustomizer);
-    }
+    cloneDeep: require('./index.js').dependencies.cloneDeep.bind(jsEl)
   };
   for (var i=0; i<element.attributes.length; i++) {
     transferAttrFromDomElToObj(element, element.attributes[i].name, jsEl);

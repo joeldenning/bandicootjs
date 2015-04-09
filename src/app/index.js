@@ -1,16 +1,4 @@
-var _ = require('lodash');
-
-module.exports.build = function(cloneDeep, domElements, domEvents, domMapping, domPatching, slashNamespacing, strictTyping) {
-  module.exports.dependencies = {
-    cloneDeep: cloneDeep,
-    domElements: domElements,
-    domEvents: domEvents,
-    domMapping: domMapping,
-    domPatching: domPatching,
-    slashNamespacing: slashNamespacing,
-    strictTyping: strictTyping
-  };
-
+module.exports.build = function() {
   module.exports.Locations = {};
   module.exports.Events = {};
   module.exports.Scenarios = {};

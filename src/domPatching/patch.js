@@ -1,5 +1,4 @@
-var _ = require('lodash');
-var deepDiff = require('deep-diff');
+var _ = require('./index.js').dependencies.lodash;
 
 function setJsAttrAsDomAttr(key, value, domEl) {
   if (key === 'tagName') {
@@ -87,7 +86,7 @@ function jsElToDomEl(jsDomEl) {
 module.exports = function(location, currentDomState, desiredDomState) {
   var domPatching = require('./index.js');
 
-  var diffs = deepDiff.diff(currentDomState, desiredDomState, function(key, path) {
+  var diffs = require('./index.js').dependencies.deepDiff.diff(currentDomState, desiredDomState, function(key, path) {
     return key === 'cloneDeep';
   });
   if (!diffs) {

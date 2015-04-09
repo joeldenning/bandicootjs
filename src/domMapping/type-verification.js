@@ -1,4 +1,4 @@
-var _ = require('lodash');
+var _ = require('./index.js').dependencies.lodash;
 
 function validateMapping(domMapping, customTypes, object) {
   for (var propertyName in domMapping) {

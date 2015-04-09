@@ -1,4 +1,4 @@
-var _ = require('lodash');
+var _ = require('../index.js').dependencies.lodash;
 
 function validatePropertyToType(property, type, object, otherTypes) {
   switch(type) {

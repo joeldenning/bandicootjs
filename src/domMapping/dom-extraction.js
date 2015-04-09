@@ -1,4 +1,4 @@
-var _ = require('lodash');
+var _ = require('./index.js').dependencies.lodash;
 
 function traverseElement(element, bandicootElements, bandicootLists,
     bandicootListToAddTo, bandicootListItemToAddTo, bandicootObjectToAddTo) {
@@ -38,9 +38,7 @@ function traverseElement(element, bandicootElements, bandicootLists,
           }
 
           bandicootListToAddTo = [];
-          bandicootListToAddTo.cloneDeep = function() {
-            return _.cloneDeep(bandicootListToAddTo, require('./index.js').dependencies.cloneDeep.lodashCustomizer);
-          };
+          bandicootListToAddTo.cloneDeep = require('./index.js').dependencies.cloneDeep.bind(bandicootListToAddTo);
           bandicootListToAddTo.push = function(listItem) {
             if (listItem && listItem.dataType === 'object') {
               listItem.dataType = 'list-item';
@@ -69,9 +67,7 @@ function traverseElement(element, bandicootElements, bandicootLists,
           }
 
           var newObject = require('./domEl-to-jsEl.js')(element);
-          newObject.cloneDeep = function() {
-            return _.cloneDeep(newObject, require('./index.js').dependencies.cloneDeep.lodashCustomizer);
-          };
+          newObject.cloneDeep = require('./index.js').dependencies.cloneDeep.bind(newObject);
 
           if (bandicootListToAddTo) {
             newObject.dataType = 'list-item';
