@@ -3,19 +3,12 @@ module.exports = function(currentDomState, domPatches) {
 
   var domState = domPatching.dependencies.cloneDeep(currentDomState);
 
-  var pathsBeingPatched = {};
-  var pathCollision = undefined;
-
   for (var domPatchName in domPatches) {
     var domPatch = domPatches[domPatchName];
-    domPatching.dependencies.deepDiff.applyDiff(domState, domPatch, function(target, source, diffArray) {
-      var path = diffArray.path.join('/')
-      if (pathsBeingPatched[path]) {
-        throw "Cannot compute dom diff -- '" + path + "' was changed by both '" + pathsBeingPatched[path] + "' and '" + domPatchName + "'";
-      }
-      pathsBeingPatched[path] = domPatchName;
-      return true;
-    });
+    var diffs = domPatching.dependencies.deepDiff.diff(domState, domPatch);
+    for (var i=diffs.length - 1; i>=0; i--) {
+      domPatching.dependencies.deepDiff.applyChange(domState, true, diffs[i]);
+    }
   }
 
   return domState;
