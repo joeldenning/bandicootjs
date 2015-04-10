@@ -47,6 +47,7 @@ coot.Scenario({
     newThingToDo.item.checkbox.value = this.dom.newItemUserInput.value;
     newThingToDo.item.label.text = this.dom.newItemUserInput.value;
     this.dom.todoList.push(newThingToDo);
+    this.dom.newItemUserInput.value = '';
   }
 });
 
@@ -103,10 +104,21 @@ coot.Scenario({
       return !thingToDo.item.checkbox.checked;
     });
   }
-})
+});
 
-coot.Event('To-do list/create new item');
-document.getElementById('newItem').value = 'joel';
-coot.Event('To-do list/create new item');
-document.getElementById('list').childNodes[1].childNodes[0].childNodes[0].click()
-coot.Event('To-do list/clear selected');
+coot.Event({
+  location: 'To-do list',
+  event: 'clear all'
+});
+
+coot.Scenario({
+  location: 'To-do list',
+  event: 'clear all',
+  scenario: 'remove all items from list',
+  condition: function() {
+    return this.dom.todoList.length > 0;
+  },
+  outcome: function() {
+    this.dom.todoList = [];
+  }
+});
