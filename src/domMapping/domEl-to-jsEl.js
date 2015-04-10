@@ -33,7 +33,11 @@ module.exports = function(element) {
   }
 
   if (_.isUndefined(jsEl.class)) {
-    jsEl.class = []
+    jsEl.class = [];
+  }
+
+  if (_.isUndefined(jsEl.style)) {
+    jsEl.style = {};
   }
 
   if (!_.isUndefined(element.checked)) {

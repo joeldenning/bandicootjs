@@ -1,4 +1,6 @@
 var _ = require('./index.js').dependencies.lodash;
+var transferAttrFromDomElToObj = require('./index.js').dependencies.domMapping.transferAttrFromDomElToObj;
+var deepDiff = require('./index.js').dependencies.deepDiff;
 
 function setJsAttrAsDomAttr(key, value, domEl) {
   if (key === 'tagName') {
@@ -83,10 +85,26 @@ function jsElToDomEl(jsDomEl) {
   return newDomElement;
 }
 
+function updateStyle(elementStyles, domElement, diff, operation) {
+  var styleProperty = diff.path[diff.path.length-1];
+  diff.path.splice(diff.path.length-1, 1);
+  var elementStylePath = diff.path.join('/');
+  if (!elementStyles[elementStylePath]) {
+    elementStyles[elementStylePath] = {
+      _element: domElement,
+      _operation: operation
+    };
+  }
+
+  if (operation === 'set') {
+    elementStyles[elementStylePath][styleProperty] = diff.rhs;
+  }
+}
+
 module.exports = function(location, currentDomState, desiredDomState) {
   var domPatching = require('./index.js');
 
-  var diffs = require('./index.js').dependencies.deepDiff.diff(currentDomState, desiredDomState, function(key, path) {
+  var diffs = deepDiff.diff(currentDomState, desiredDomState, function(key, path) {
     return key === 'cloneDeep';
   });
   if (!diffs) {
@@ -96,6 +114,7 @@ module.exports = function(location, currentDomState, desiredDomState) {
 
   var domOperationsToPerform = [];
   var elementAttribute, attrName;
+  var elementStyles = {};
 
   for (var i=0; i<diffs.length; i++) {
     var diff = diffs[i];
@@ -129,14 +148,18 @@ module.exports = function(location, currentDomState, desiredDomState) {
           throw "could not find child";
         }
       } else {
-        var newEl = domElement.querySelector('[data-name="' + partOfPath + '"]');
-        if (newEl) {
-          domElement = newEl;
+        if (partOfPath === 'style') {
+          continueSearching = false;
         } else {
-          elementAttribute = domPatching.dependencies.domMapping.transferAttrFromDomElToObj(domElement, partOfPath);
-          if (elementAttribute) {
-            continueSearching = false;
-            attrName = partOfPath;
+          var newEl = domElement.querySelector('[data-name="' + partOfPath + '"]');
+          if (newEl) {
+            domElement = newEl;
+          } else {
+            elementAttribute = transferAttrFromDomElToObj(domElement, partOfPath);
+            if (elementAttribute) {
+              continueSearching = false;
+              attrName = partOfPath;
+            }
           }
         }
       }
@@ -237,7 +260,22 @@ module.exports = function(location, currentDomState, desiredDomState) {
               element: domElement
             });
             patchSupported = true;
+          } else if (diff.path[diff.path.length-2] === 'style') {
+            updateStyle(elementStyles, domElement, diff, 'set');
+            patchSupported = true;
           }
+        }
+      break;
+      case 'N': //new
+        if (diff.path[diff.path.length-2] === 'style') {
+          updateStyle(elementStyles, domElement, diff, 'set');
+          patchSupported = true;
+        }
+      break;
+      case 'D': //delete
+        if (diff.path[diff.path.length-2] === 'style') {
+          updateStyle(elementStyles, domElement, diff, 'unset');
+          patchSupported = true;
         }
       break;
     }
@@ -275,4 +313,22 @@ module.exports = function(location, currentDomState, desiredDomState) {
       break;
     }
   });
+
+  //now perform style changes
+  for (var pathToEl in elementStyles) {
+    var styleObjects = elementStyles[pathToEl];
+    var styleString = '';
+    for (var styleProperty in styleObjects) {
+      if (styleProperty === '_element' || styleProperty === '_operation') {
+        continue;
+      }
+      if (styleObjects._operation === 'set') {
+        if (styleString !== '') {
+          styleString += '; ';
+        }
+        styleString += styleProperty + ': ' + styleObjects[styleProperty];
+      }
+    }
+    setJsAttrAsDomAttr('style', styleString, styleObjects._element);
+  }
 }
