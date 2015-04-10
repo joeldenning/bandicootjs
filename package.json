@@ -1,6 +1,6 @@
 {
   "name": "bandicoot",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "my web framework haha",
   "main": "src/bandicoot-builder.js",
   "repository": {
