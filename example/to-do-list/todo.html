@@ -17,7 +17,7 @@
 
 <body>
   <div data-location="To-do list" class="horizontal-center">
-    <input data-type="element" data-name="newItemUserInput" type="text" placeholder="A new thing to do" value="say hello" id="newItem">
+    <input data-type="element" data-name="newItemUserInput" type="text" placeholder="A new thing to do" value="say hello" onkeydown="coot.Event('To-do list/create new item', arguments)" id="newItem">
     <button onclick="coot.Event('To-do list/create new item', arguments)">Add thing to do</button>
     <br>
     <button onclick="coot.Event('To-do list/clear selected', arguments)">Remove selected</button>

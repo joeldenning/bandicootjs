@@ -18,6 +18,7 @@
     "gulp-mocha": "^2.0.0",
     "gulp-util": "^3.0.4",
     "jsdom": "^4.0.0",
+    "keycode": "^2.0.0",
     "lodash": "^3.5.0",
     "sinon": "~1.12.2",
     "vinyl-source-stream": "^1.0.0"

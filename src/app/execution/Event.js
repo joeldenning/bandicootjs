@@ -73,13 +73,30 @@ function triggerEvent(eventName, domArgs) {
     if (!domArgs) {
       throw "The dom event arguments were not passed into the function -- cannot create 'this.event'";
     }
-    eventSourceDomElement = app.dependencies.domEvents.getEventSourceDomElement(domArgs);
-    eventSourcePath = app.dependencies.domMapping.reverseEngineerPathToElement(eventSourceDomElement);
 
     try {
       app.dependencies.domMapping.verifyTypes(event.this, undefined, eventVariables.event);
     } catch (ex) {
       "Error mapping the 'this' property for event '" + event.event + "' to the actual dom event -- " + ex;
+    }
+
+    if (event.this.event.source) {
+      eventSourceDomElement = app.dependencies.domEvents.getEventSourceDomElement(domArgs);
+      eventSourcePath = app.dependencies.domMapping.reverseEngineerPathToElement(eventSourceDomElement);
+    }
+  }
+
+  var keyboardEvent;
+  if (domArgs.length === 1 && (domArgs[0].type === 'keydown' || domArgs[0].type === 'keyup')) {
+    keyboardEvent = domArgs[0];
+  }
+
+  if (event.condition) {
+    var args = applicationArgsCreator(domVariables, eventSourcePath, eventSourceDomElement, keyboardEvent);
+    var eventConditionMet = event.condition.apply(args);
+    if (eventConditionMet !== true) {
+      console.log("Event condition was not met");
+      return;
     }
   }
 
@@ -87,7 +104,7 @@ function triggerEvent(eventName, domArgs) {
 
   Object.keys(possibleScenarios).forEach(function(possibleScenarioName) {
     var possibleScenario = possibleScenarios[possibleScenarioName];
-    var args = applicationArgsCreator(domVariables, eventSourcePath, eventSourceDomElement);
+    var args = applicationArgsCreator(domVariables, eventSourcePath, eventSourceDomElement, keyboardEvent);
 
     var booleanExpressionResult;
     try {

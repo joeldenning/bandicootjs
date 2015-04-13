@@ -21,6 +21,7 @@ module.exports.build = function() {
   //build modules
   framework.lodash = require('lodash');
   framework.deepDiff = require('deep-diff');
+  framework.keycode = require('keycode');
   buildModule('cloneDeep', require('./cloneDeep/index.js'), ['lodash']);
   buildModule('strictTyping', require('./strictTyping/index.js'), ['lodash']);
   buildModule('slashNamespacing', require('./slashNamespacing/index.js'), ['lodash']);

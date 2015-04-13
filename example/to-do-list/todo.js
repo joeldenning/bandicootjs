@@ -21,25 +21,22 @@ coot.Location({
 
 coot.Event({
   location: 'To-do list',
-  event: 'create new item'
-});
-
-coot.Event({
-  location: 'To-do list',
-  event: 'toggle item checked',
-  this: {
-    event: {
-      source: 'element<input>'
-    } 
+  event: 'create new item',
+  condition: function() {
+    if (this.event.keyboard) {
+      return coot.framework.keycode(this.event.keyboard.keyCode) === 'enter'
+    } else {
+      return true;
+    }
   }
-})
+});
 
 coot.Scenario({
   location: 'To-do list',
   event: 'create new item',
   scenario: 'add new row to bulleted list',
   condition: function() {
-    return this.dom.newItemUserInput.value.length > 0;
+    return this.dom.newItemUserInput.value.trim().length > 0;
   },
   outcome: function() {
     var newThingToDo = this.buildingBlocks.thingToDo.cloneDeep();
@@ -72,6 +69,16 @@ coot.Scenario({
   },
   outcome: function() {
     this.event.source.class.push('completed-item');
+  }
+});
+
+coot.Event({
+  location: 'To-do list',
+  event: 'toggle item checked',
+  this: {
+    event: {
+      source: 'element<input>'
+    } 
   }
 });
 
