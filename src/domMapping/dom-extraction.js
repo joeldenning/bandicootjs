@@ -1,7 +1,7 @@
 var _ = require('./index.js').dependencies.lodash;
 
 function traverseElement(element, bandicootElements, bandicootLists,
-    bandicootListToAddTo, bandicootListItemToAddTo, bandicootObjectToAddTo) {
+    bandicootListToAddTo, bandicootListItemToAddTo, bandicootObjectToAddTo, buildingBlocks) {
 
   if (_.isFunction(element.getAttribute)) {
     var dataName = element.getAttribute('data-name');
@@ -92,8 +92,34 @@ function traverseElement(element, bandicootElements, bandicootLists,
   }
 
   for (var i=0; i<element.childNodes.length; i++) {
-    traverseElement(element.childNodes[i], bandicootElements, bandicootLists,
-      bandicootListToAddTo, bandicootListItemToAddTo, bandicootObjectToAddTo);
+    var childNode = element.childNodes[i];
+    if (childNode.tagName && childNode.tagName.toUpperCase() === 'SCRIPT') {
+      var dataName = element.getAttribute('data-name');
+      if (buildingBlocks[dataName]) {
+        throw "Two building blocks have the same name '" + dataName + "'";
+      }
+
+      var lists = {};
+      var elements = {};
+      var objects = {};
+      var listToAddTo = listItemToAddTo = undefined;
+
+      var domParser = new DOMParser();
+      var parsedDom = domParser.parseFromString(childNode.text, "text/html");
+      traverseElement(parsedDom, elements, lists, listToAddTo, listItemToAddTo,
+        objects, buildingBlocks);
+
+      buildingBlocks[dataName] = {
+        lists: lists,
+        elements: elements,
+        objects: objects
+      };
+
+    } else {
+      //not a script tag
+      traverseElement(childNode, bandicootElements, bandicootLists,
+        bandicootListToAddTo, bandicootListItemToAddTo, bandicootObjectToAddTo, buildingBlocks);   
+    }
   }
 };
 
@@ -117,55 +143,34 @@ function mergeListsElementsAndObjects(target, lists, elements, objects) {
 
 module.exports = function(location) {
   var matchingLocations = document.querySelectorAll('[data-location="' + location + '"]');
-  var domLocation;
-  var buildingBlockLocations = [];
-  for (var i=0; i<matchingLocations.length; i++) {
-    if (matchingLocations[i].tagName.toUpperCase() === 'SCRIPT') {
-      if (matchingLocations[i].getAttribute('type') === 'html/building-blocks') {
-        buildingBlockLocations.push(matchingLocations[i]);
-      } else {
-        //ignore locations declared in script tags that are not html/building-blocks
-      }
-    } else {
-      if (domLocation) {
-        throw "Only one '" + domLocation + "' location can be present in the DOM at a time, except for building block locations declared in script tags";
-      } else {
-        domLocation = matchingLocations[i];
-      }
-    }
+  if (matchingLocations.length < 1) {
+    throw "Could not find location '" + location + "' in the DOM";
+  } else if (matchingLocations.length > 1) {
+    throw "Clashing locations: there are two locations named '" + location + "'";
   }
+
+  var domLocation = matchingLocations[0];
 
   var result = {
     dom: {},
     buildingBlocks: {}
   };
 
-  if (domLocation) {
-    var bandicootLists = {};
-    var bandicootElements = {};
-    var bandicootObjects = {};
-    var bandicootListToAddTo = bandicootListItemToAddTo = undefined;
+  var bandicootLists = {};
+  var bandicootElements = {};
+  var bandicootObjects = {};
+  var bandicootListToAddTo = bandicootListItemToAddTo = undefined;
+  var buildingBlocks = {};
 
-    traverseElement(domLocation, bandicootElements, bandicootLists, bandicootListToAddTo, bandicootListItemToAddTo, 
-      bandicootObjects);
+  traverseElement(domLocation, bandicootElements, bandicootLists, bandicootListToAddTo, bandicootListItemToAddTo, 
+    bandicootObjects, buildingBlocks);
 
-    mergeListsElementsAndObjects(result.dom, bandicootLists, bandicootElements, bandicootObjects);
-  }
+  mergeListsElementsAndObjects(result.dom, bandicootLists, bandicootElements, bandicootObjects);
 
-  if (buildingBlockLocations.length > 0) {
-    var bandicootLists = {};
-    var bandicootElements = {};
-    var bandicootObjects = {};
-    var bandicootListToAddTo = bandicootListItemToAddTo = undefined;
-
-    var domParser = new DOMParser();
-    for (var i=0; i<buildingBlockLocations.length; i++) {
-      var parsedDom = domParser.parseFromString(buildingBlockLocations[i].text, "text/html");
-      traverseElement(parsedDom, bandicootElements, bandicootLists, bandicootListToAddTo, bandicootListItemToAddTo,
-        bandicootObjects);
-    }
-
-    mergeListsElementsAndObjects(result.buildingBlocks, bandicootLists, bandicootElements, bandicootObjects);
+  for (var buildingBlockName in buildingBlocks) {
+    var buildingBlock = buildingBlocks[buildingBlockName];
+    mergeListsElementsAndObjects(result.buildingBlocks, buildingBlock.lists, 
+        buildingBlock.elements, buildingBlock.objects);
   }
 
   return result;

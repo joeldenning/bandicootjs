@@ -1,0 +1,46 @@
+<head>
+  <link rel="stylesheet" type="text/css" href="/bandicootjs/example/to-do list/todo.css"></link>
+  <script type="text/javascript" src="/bandicootjs/dist/bandicoot.js"></script>
+
+  <script type="text/javascript" src="/bandicootjs/example/to-do list/location.js"></script>
+  <script type="text/javascript" src="/bandicootjs/example/to-do list/clear all/event.js"></script>
+  <script type="text/javascript" src="/bandicootjs/example/to-do list/clear all/scenarios.js"></script>
+  <script type="text/javascript" src="/bandicootjs/example/to-do list/clear selected/event.js"></script>
+  <script type="text/javascript" src="/bandicootjs/example/to-do list/clear selected/scenarios.js"></script>
+  <script type="text/javascript" src="/bandicootjs/example/to-do list/create new item/event.js"></script>
+  <script type="text/javascript" src="/bandicootjs/example/to-do list/create new item/scenarios.js"></script>
+  <script type="text/javascript" src="/bandicootjs/example/to-do list/filter changed/event.js"></script>
+  <script type="text/javascript" src="/bandicootjs/example/to-do list/filter changed/scenarios.js"></script>
+  <script type="text/javascript" src="/bandicootjs/example/to-do list/toggle item checked/event.js"></script>
+  <script type="text/javascript" src="/bandicootjs/example/to-do list/toggle item checked/scenarios.js"></script>
+
+</head>
+
+<body>
+  <div data-location="To-do list" class="horizontal-center">
+    <script type="html/building-blocks">
+      <li data-type="list-item" data-name="thingToDo">
+        <label data-type="object" data-name="item" onclick="coot.Event('To-do list/toggle item checked', arguments)">
+          <input data-type="element" data-name="checkbox" type="checkbox" name="to-do list">
+          <span data-type="element" data-name="label"></span>
+        </label>
+      </li>
+    </script>
+
+    <input data-type="element" data-name="newItemUserInput" type="text" placeholder="A new thing to do" value="say hello" onkeydown="coot.Event('To-do list/create new item', arguments)" id="newItem">
+    <button onclick="coot.Event('To-do list/create new item', arguments)">Add thing to do</button>
+    <br>
+    <button onclick="coot.Event('To-do list/clear selected', arguments)">Remove selected</button>
+    <button onclick="coot.Event('To-do list/clear all', arguments)">Remove all</button>
+    
+    <br>Filter tasks
+    <select data-type="object" data-name="filter" onchange="coot.Event('To-do list/filter changed', arguments)">
+      <option value="all" selected>All</option>
+      <option value="remaining">Remaining</option>
+      <option value="completed">Completed</option>
+    </select>
+
+    <ul data-type="list" data-name="todoList" style="list-style-type: none" id="list">
+    </ul>
+  </div>
+</body>
