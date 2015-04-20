@@ -15,6 +15,8 @@ module.exports = function(input, domArgs) {
       throw 'Event with name "' + fullyQualifiedName + "' already exists";
     }
     app.dependencies.slashNamespacing.addPropertyToObjectFromSlashNamespacedName(app.Events, fullyQualifiedName, event);
+    
+
   }
 };
 
@@ -124,8 +126,25 @@ function triggerEvent(eventName, domArgs) {
 
   var scenarioDomState = {};
 
+
+  //we iterate through the scenarios randomly so that no one depends on scenario execution order.
+  function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+  }
+
+  var indicesLeft = [];
+  for (var i=0; i<scenariosToExecute.length; i++) {
+    indicesLeft.push(i);
+  }
+
   var atLeastOneScenarioSucceeded = false;
-  scenariosToExecute.forEach(function(scenario) {
+
+  while (indicesLeft.length > 0) {
+    var randomIndexOfIndex = getRandomInt(0, indicesLeft.length);
+    var randomIndex = indicesLeft[randomIndexOfIndex];
+    indicesLeft.splice(randomIndexOfIndex, 1);
+
+    var scenario = scenariosToExecute[randomIndex];
     try {
       var args = applicationArgsCreator(domVariables, eventSourcePath, eventSourceDomElement);
       scenario.outcome.call(args);
@@ -134,7 +153,7 @@ function triggerEvent(eventName, domArgs) {
     } catch (ex) {
       console.log('Scenario "' + ScenarioPrototype.getFullyQualifiedName(scenario) + '" failed with error -- ' + ex.stack);
     }
-  });
+  }
 
   if (atLeastOneScenarioSucceeded) {
     var newDomState = app.dependencies.domPatching.calculateDesiredDomState(domVariables.dom, scenarioDomState);
