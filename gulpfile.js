@@ -36,6 +36,7 @@ gulp.task('run-browserify', function(done) {
     debug: true
   };
   return browserify(browserifyOpts)
+    .transform('brfs')
     .bundle()
     .on('error', console.error)
     .pipe(source('bandicoot.js'))

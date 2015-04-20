@@ -10,6 +10,7 @@
   "author": "Joel Denning <joeldenning@gmail.com>",
   "dependencies": {},
   "devDependencies": {
+    "brfs": "^1.4.0",
     "browserify": "^9.0.3",
     "chai": "~2.1.0",
     "deep-diff": "^0.3.0",
@@ -21,7 +22,8 @@
     "keycode": "^2.0.0",
     "lodash": "^3.5.0",
     "sinon": "~1.12.2",
-    "vinyl-source-stream": "^1.0.0"
+    "vinyl-source-stream": "^1.0.0",
+    "web-worker": "^0.1.6"
   },
   "scripts": {
     "test": "gulp test"

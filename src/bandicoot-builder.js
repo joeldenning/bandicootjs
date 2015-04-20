@@ -22,6 +22,7 @@ module.exports.build = function() {
   framework.lodash = require('lodash');
   framework.deepDiff = require('deep-diff');
   framework.keycode = require('keycode');
+  buildModule('webworker', require('./webworker/index.js'), []);
   buildModule('cloneDeep', require('./cloneDeep/index.js'), ['lodash']);
   buildModule('strictTyping', require('./strictTyping/index.js'), ['lodash']);
   buildModule('slashNamespacing', require('./slashNamespacing/index.js'), ['lodash']);
@@ -33,7 +34,7 @@ module.exports.build = function() {
   //now build the app
   var unbuiltApp = require('./app/index.js');
   injectDependencies(unbuiltApp, ['cloneDeep', 'domElements', 'domEvents', 'domMapping', 
-    'domPatching', 'slashNamespacing', 'strictTyping', 'lodash']);
+    'domPatching', 'slashNamespacing', 'strictTyping', 'lodash', 'webworker']);
   var builtApp = unbuiltApp.build();
 
   framework.lodash.assign(bandicoot, builtApp);

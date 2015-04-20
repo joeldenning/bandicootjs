@@ -1,9 +1,9 @@
-var _ = require('../index.js').dependencies.lodash;
+var app = require('../index.js');
+var _ = app.dependencies.lodash;
 
 module.exports = function(input, domArgs) {
   var EventPrototype = require('../prototype/Event.js');
   var ScenarioPrototype = require('../prototype/Scenario.js');
-  var app = require('../index.js');
 
   if (typeof input === 'string') {
     triggerEvent(input, domArgs);
@@ -15,8 +15,6 @@ module.exports = function(input, domArgs) {
       throw 'Event with name "' + fullyQualifiedName + "' already exists";
     }
     app.dependencies.slashNamespacing.addPropertyToObjectFromSlashNamespacedName(app.Events, fullyQualifiedName, event);
-    
-
   }
 };
 
@@ -93,8 +91,10 @@ function triggerEvent(eventName, domArgs) {
     keyboardEvent = domArgs[0];
   }
 
+  var applicationArgs = applicationArgsCreator(domVariables, eventSourcePath, eventSourceDomElement, keyboardEvent);
+
   if (event.condition) {
-    var args = applicationArgsCreator(domVariables, eventSourcePath, eventSourceDomElement, keyboardEvent);
+    var args = app.dependencies.cloneDeep(applicationArgs);
     var eventConditionMet = event.condition.apply(args);
     if (eventConditionMet !== true) {
       console.log("Event condition was not met");
@@ -106,7 +106,7 @@ function triggerEvent(eventName, domArgs) {
 
   Object.keys(possibleScenarios).forEach(function(possibleScenarioName) {
     var possibleScenario = possibleScenarios[possibleScenarioName];
-    var args = applicationArgsCreator(domVariables, eventSourcePath, eventSourceDomElement, keyboardEvent);
+    var args = app.dependencies.cloneDeep(applicationArgs);
 
     var booleanExpressionResult;
     try {
@@ -124,39 +124,26 @@ function triggerEvent(eventName, domArgs) {
     console.log("No scenario conditions were met");
   }
 
-  var scenarioDomState = {};
+  app.nextAvailableScenarioWorker(function(scenarioWorker) {
+    
+    scenarioWorker.postMessage({
+      command: 'executeScenarios',
+      applicationArgs: app.dependencies.cloneDeep(applicationArgs),
+      scenarios: scenariosToExecute
+    });
 
+    scenarioWorker.onmessage = function(e) {
+      if (e.data.atLeastOneScenarioSucceeded) {
+        var newDomState = app.dependencies.domPatching.calculateDesiredDomState(domVariables.dom, scenarioDomState);
+        app.dependencies.domPatching.patchDom(event.location, domVariables.dom, newDomState);
+      }
 
-  //we iterate through the scenarios randomly so that no one depends on scenario execution order.
-  function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
-  }
+      app.workerComplete(scenarioWorker);
+    };
 
-  var indicesLeft = [];
-  for (var i=0; i<scenariosToExecute.length; i++) {
-    indicesLeft.push(i);
-  }
-
-  var atLeastOneScenarioSucceeded = false;
-
-  while (indicesLeft.length > 0) {
-    var randomIndexOfIndex = getRandomInt(0, indicesLeft.length);
-    var randomIndex = indicesLeft[randomIndexOfIndex];
-    indicesLeft.splice(randomIndexOfIndex, 1);
-
-    var scenario = scenariosToExecute[randomIndex];
-    try {
-      var args = applicationArgsCreator(domVariables, eventSourcePath, eventSourceDomElement);
-      scenario.outcome.call(args);
-      scenarioDomState[ScenarioPrototype.getFullyQualifiedName(scenario)] = args.dom;
-      atLeastOneScenarioSucceeded = true;
-    } catch (ex) {
-      console.log('Scenario "' + ScenarioPrototype.getFullyQualifiedName(scenario) + '" failed with error -- ' + ex.stack);
+    scenarioWorker.onerror = function(e) {
+      app.workerComplete(scenarioWorker);
+      throw e;
     }
-  }
-
-  if (atLeastOneScenarioSucceeded) {
-    var newDomState = app.dependencies.domPatching.calculateDesiredDomState(domVariables.dom, scenarioDomState);
-    app.dependencies.domPatching.patchDom(event.location, domVariables.dom, newDomState);
-  }
+  });
 };
