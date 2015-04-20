@@ -7,4 +7,5 @@ module.exports = function(objectDefinitionBuilder) {
 
   objectDefinitionBuilder.requireProperty('location');
   objectDefinitionBuilder.requireProperty('this');
+  objectDefinitionBuilder.requireProperty('owner');
 };

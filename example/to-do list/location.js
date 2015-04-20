@@ -1,5 +1,6 @@
 coot.Location({
   location: 'To-do list',
+  owner: 'Joel',
   this: {
     dom: {
       todoList: 'list<thingToDo>',
