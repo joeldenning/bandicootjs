@@ -1,4 +1,5 @@
 coot.Event({
   location: 'To-do list',
-  event: 'clear all'
+  event: 'clear all',
+  owner: 'joel'
 });

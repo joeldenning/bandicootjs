@@ -37,6 +37,10 @@ function triggerEvent(eventName, domArgs) {
     throw "No such location '" + event.location + "' in bandicoot.app.Locations object.";
   }
 
+  if (location.owner.toLowerCase() !== event.owner.toLowerCase()) {
+    throw "Location owner '" + location.owner + "' does not match the Event owner '" + event.owner + "'";
+  }
+
   var possibleScenarios;
   if (app.Scenarios[event.location] && app.Scenarios[event.location][event.event]) {
     possibleScenarios = app.Scenarios[event.location][event.event];
