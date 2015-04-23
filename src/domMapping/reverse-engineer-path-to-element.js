@@ -23,10 +23,9 @@ function reverseEngineerPathToElement(element, pathArray) {
     } else {
       pathArray.unshift(dataName);
     }
-    reverseEngineerPathToElement(element.parentNode, pathArray);
-  } else {
-    throw "Element '" + element.tagName + "' does not have a data-name attribute";
   }
+
+  reverseEngineerPathToElement(element.parentNode, pathArray);
 }
 
 module.exports = function(element) {

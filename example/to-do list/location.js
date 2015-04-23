@@ -5,6 +5,8 @@ coot.Location({
     dom: {
       todoList: 'list<thingToDo>',
       newItemUserInput: 'element<input>',
+      showRemaining: 'element<input>',
+      showCompleted: 'element<input>'
     },
     buildingBlocks: {
       thingToDo: 'thingToDo'
