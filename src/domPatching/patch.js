@@ -74,6 +74,18 @@ function jsElToDomEl(jsDomEl) {
         } else {
           setJsAttrAsDomAttr(attr, attrValue, newDomElement);
         }
+      } else if (attr === 'style') {
+        if (!_.isPlainObject(attrValue)) {
+          throw "The style property must be a plain javascript object";
+        }
+        var styleAsString = '';
+        var prefix = '';
+        for (var cssAttr in attrValue) {
+          var cssValue = attrValue[cssAttr];
+          styleAsString += prefix + cssAttr + ": " + cssValue;
+          prefix = '; ';
+        }
+        setJsAttrAsDomAttr('style', styleAsString, newDomElement);
       } else {
         setJsAttrAsDomAttr(attr, attrValue, newDomElement);
       }

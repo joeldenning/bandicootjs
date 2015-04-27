@@ -10,9 +10,12 @@ coot.Scenario({
     delete newThingToDo.item.checkbox.checked;
     newThingToDo.item.checkbox.value = this.dom.newItemUserInput.value;
     newThingToDo.item.label.text = this.dom.newItemUserInput.value;
+    if (!this.dom.showRemaining.checked) {
+      newThingToDo.item.style.display = 'none';
+    }
+
     this.dom.todoList.push(newThingToDo);
     this.dom.newItemUserInput.value = '';
-    // coot.Event('To-do list/filter changed');
   }
 });
 
