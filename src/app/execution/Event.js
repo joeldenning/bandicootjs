@@ -50,23 +50,23 @@ function triggerEvent(eventName, domArgs) {
   }
 
   var domVariables = app.dependencies.domMapping.extractToVariables(location.location);
-  if (location.this.dom) {
-    if (_.size(location.this.dom) > 0 && _.size(domVariables.dom) === 0) {
+  if (location.inject.dom) {
+    if (_.size(location.inject.dom) > 0 && _.size(domVariables.dom) === 0) {
       throw "No location '" + location.location + "' was found in the dom";
     }
     try {
-      app.dependencies.domMapping.verifyTypes(location.this.dom, location.types, domVariables.dom);
+      app.dependencies.domMapping.verifyTypes(location.inject.dom, location.types, domVariables.dom);
     } catch (ex) {
       throw "Error mapping DOM location '" + location.location + "' to the javascript location of the same name -- " + ex;
     }
   }
 
-  if (location.this.buildingBlocks) {
-    if (_.size(location.this.buildingBlocks) > 0 && _.size(domVariables.buildingBlocks) === 0) {
+  if (location.inject.buildingBlocks) {
+    if (_.size(location.inject.buildingBlocks) > 0 && _.size(domVariables.buildingBlocks) === 0) {
       throw "No location '" + location.location + "' was found in building blocks";
     }
     try {
-      app.dependencies.domMapping.verifyTypes(location.this.buildingBlocks, location.types, domVariables.buildingBlocks);
+      app.dependencies.domMapping.verifyTypes(location.inject.buildingBlocks, location.types, domVariables.buildingBlocks);
     } catch (ex) {
       throw "Error mapping building blocks for location '" + location.location + "' to the javascript location of the same name -- " + ex;
     }
@@ -75,18 +75,18 @@ function triggerEvent(eventName, domArgs) {
   var eventSourcePath;
   var eventSourceDomElement;
 
-  if (event.this) {
+  if (event.inject) {
     if (!domArgs) {
-      throw "The dom event arguments were not passed into the function -- cannot create 'this.event'";
+      throw "The dom event arguments were not passed into the function -- cannot inject them";
     }
 
     try {
-      app.dependencies.domMapping.verifyTypes(event.this, undefined, eventVariables.event);
+      app.dependencies.domMapping.verifyTypes(event.inject, undefined, eventVariables.event);
     } catch (ex) {
-      "Error mapping the 'this' property for event '" + event.event + "' to the actual dom event -- " + ex;
+      "Error injecting the 'dom' property for event '" + event.event + "' to the actual dom event -- " + ex;
     }
 
-    if (event.this.event.source) {
+    if (event.inject.event.source) {
       eventSourceDomElement = app.dependencies.domEvents.getEventSourceDomElement(domArgs);
       eventSourcePath = app.dependencies.domMapping.reverseEngineerPathToElement(eventSourceDomElement);
     }

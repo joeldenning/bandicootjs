@@ -12,6 +12,7 @@ coot.Scenario({
     newThingToDo.item.label.text = this.dom.newItemUserInput.value;
     this.dom.todoList.push(newThingToDo);
     this.dom.newItemUserInput.value = '';
+    // coot.Event('To-do list/filter changed');
   }
 });
 

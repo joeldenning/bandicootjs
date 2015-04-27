@@ -1,7 +1,7 @@
 coot.Location({
   location: 'To-do list',
   owner: 'Joel',
-  this: {
+  inject: {
     dom: {
       todoList: 'list<thingToDo>',
       newItemUserInput: 'element<input>',

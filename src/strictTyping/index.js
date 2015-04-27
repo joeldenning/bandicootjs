@@ -26,14 +26,14 @@ module.exports.build = function() {
     
     module.defineStrictlyTypedObject('CustomVariableType', require('../strictTyping/objectDefinitions/CustomVariableType.js'));
     module.defineStrictlyTypedObject('DomMapping', require('../strictTyping/objectDefinitions/DomMapping.js'));
-    module.defineStrictlyTypedObject('EventVariables', require('../strictTyping/objectDefinitions/EventVariables.js'));
+    module.defineStrictlyTypedObject('LocationInject', require('../strictTyping/objectDefinitions/LocationInject.js'));
     module.defineStrictlyTypedObject('VariableTypeDefinitions', require('../strictTyping/objectDefinitions/VariableTypeDefinitions.js'));
     module.defineStrictlyTypedObject('Scenario', require('../strictTyping/objectDefinitions/Scenario.js'));
-    module.defineStrictlyTypedObject('EventContext', require('../strictTyping/objectDefinitions/EventContext.js'));
+    module.defineStrictlyTypedObject('EventInject', require('../strictTyping/objectDefinitions/EventInject.js'));
     module.defineStrictlyTypedObject('Event', require('../strictTyping/objectDefinitions/Event.js'));
     module.defineStrictlyTypedObject('DomElementDefinition', require('../strictTyping/objectDefinitions/DomElementDefinition.js'));
     module.defineStrictlyTypedObject('Location', require('../strictTyping/objectDefinitions/Location.js'));
-    module.defineStrictlyTypedObject('ThisDotEvent', require('../strictTyping/objectDefinitions/ThisDotEvent.js'));
+    module.defineStrictlyTypedObject('EventInjectEvent', require('../strictTyping/objectDefinitions/EventInjectEvent.js'));
     
     return module;
 }
