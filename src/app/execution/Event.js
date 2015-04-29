@@ -15,8 +15,7 @@ module.exports = function(input, domArgs) {
       throw 'Event with name "' + fullyQualifiedName + "' already exists";
     }
     app.dependencies.slashNamespacing.addPropertyToObjectFromSlashNamespacedName(app.Events, fullyQualifiedName, event);
-    
-
+    return event;
   }
 };
 

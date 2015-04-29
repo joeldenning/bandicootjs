@@ -12,5 +12,6 @@ module.exports = function(input, Scenarios) {
       throw 'Event with name "' + fullyQualifiedName + "' already exists";
     }
     app.dependencies.slashNamespacing.addPropertyToObjectFromSlashNamespacedName(app.Scenarios, fullyQualifiedName, scenario);
+    return scenario;
   }
 }

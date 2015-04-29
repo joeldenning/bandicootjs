@@ -16,4 +16,5 @@ module.exports = function(input) {
   }
 
   app.dependencies.slashNamespacing.addPropertyToObjectFromSlashNamespacedName(app.Locations, fullyQualifiedName, location);
+  return location;
 }
