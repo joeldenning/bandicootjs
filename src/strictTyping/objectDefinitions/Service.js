@@ -4,6 +4,7 @@ module.exports = function(objectDefinitionBuilder) {
   objectDefinitionBuilder.addProperty('location').withType('string').matchingPattern(noSlashesPattern);
   objectDefinitionBuilder.addProperty('owner').withType('string').matchingPattern(noSlashesPattern);
   objectDefinitionBuilder.addProperty('inject').withType('strictlyTypedObject', 'ServiceInject');
+  objectDefinitionBuilder.addProperty('initialize').withType('function');
 
   objectDefinitionBuilder.requireProperty('owner');
   objectDefinitionBuilder.requireProperty('service');

@@ -3,6 +3,7 @@ module.exports.build = function() {
   module.exports.Events = {};
   module.exports.Scenarios = {};
   module.exports.Services = {};
+  module.exports.ServiceInjectedProperties = {};
 
   return {
     app: {
@@ -17,6 +18,6 @@ module.exports.build = function() {
     Location: require('./execution/Location.js'),
     Event: require('./execution/Event.js'),
     Scenario: require('./execution/Scenario.js'),
-    Services: require('./execution/Services.js')
+    Service: require('./execution/Service.js')
   };
 };

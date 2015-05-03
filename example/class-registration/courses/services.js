@@ -5,7 +5,7 @@ coot.Service({
   inject: {
     db: 'loki'
   },
-  constructor: function() {
+  initialize: function() {
     this.collection = this.db.addCollection('courses');
   },
   getPopularCourses: function() {
