@@ -1,0 +1,56 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="css" href="/bandicootjs/example/class-registration/class-registration.css"></link>
+
+    <script type="text/javascript" src="/bandicootjs/dist/bandicoot.js"></script>
+
+    <script type="text/javascript" src="/bandicootjs/example/class-registration/calendar/location.js"></script>
+    <script type="text/javascript" src="/bandicootjs/example/class-registration/courses/location.js"></script>
+    <script type="text/javascript" src="/bandicootjs/example/class-registration/courses/filter changed.js"><script>
+    <script type="text/javascript" src="/bandicootjs/example/class-registration/courses/service.js"><script>
+    <script type="text/javascript" src="/bandicootjs/example/class-registration/register/location.js"></script>
+    <script type="text/javascript" src="/bandicootjs/example/class-registration/sections/location.js"></script>
+    <script type="text/javascript">
+      window.onload = function() {
+        coot.Event('courses/filter changed', arguments);
+      }
+    </script>
+  </head>
+  <body>
+    <div class="class-registration-layout">
+      <div class="class-registration-column" data-location="courses">
+        Search for courses:<input type="text" data-name="search" data-type="object">
+        <table class="pretty-table" data-name="visibleCourses" data-type="table">
+          <tr>
+            <th>Course ID</th><th>Department</th><th>Course Name</th><th>Credits</th>
+          </tr>
+        </table>
+
+        <script type="html/building-blocks">
+          <table>
+            <tr data-type="table-row" data-name="course">
+              <td data-type="element" data-name="courseId"></td>
+              <td data-type="element" data-name="department"></td>
+              <td data-type="element" data-name="courseName"></td>
+              <td data-type="element" data-name="credits"></td>
+            </tr>
+          </table>
+        </script>
+      </div>
+
+      <div class="class-registration-column" data-location="sections">
+        Sections will be shown here
+      </div>
+
+      <div class="class-registration-column">
+        <div data-location="register">
+          Registration button will be shown here
+        </div>
+
+        <div data-location="calendar">
+          Calendar will be shown here
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

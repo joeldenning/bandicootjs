@@ -1,0 +1,13 @@
+.class-registration-layout {
+  display: table;
+}
+
+.class-registration-column {
+  display: table-cell;
+}
+
+.pretty-table tr,th {
+  border: 1px;
+  border-color: gray;
+  padding: 5px;
+}
