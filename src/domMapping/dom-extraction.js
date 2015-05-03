@@ -1,7 +1,9 @@
-var _ = require('./index.js').dependencies.lodash;
+var domMapping = require('./index.js');
+var _ = domMapping.dependencies.lodash;
 
 function traverseElement(element, bandicootElements, bandicootLists,
-    bandicootListToAddTo, bandicootListItemToAddTo, bandicootObjectToAddTo, buildingBlocks) {
+    bandicootListToAddTo, bandicootListItemToAddTo, bandicootObjectToAddTo, 
+    bandicootTableToAddTo, buildingBlocks) {
 
   if (_.isFunction(element.getAttribute)) {
     var dataName = element.getAttribute('data-name');
@@ -38,7 +40,7 @@ function traverseElement(element, bandicootElements, bandicootLists,
           }
 
           bandicootListToAddTo = [];
-          bandicootListToAddTo.cloneDeep = require('./index.js').dependencies.cloneDeep.bind(bandicootListToAddTo);
+          bandicootListToAddTo.cloneDeep = domMapping.dependencies.cloneDeep.bind(bandicootListToAddTo);
           bandicootListToAddTo.push = function(listItem) {
             if (listItem && listItem.dataType === 'object') {
               listItem.dataType = 'list-item';
@@ -67,7 +69,7 @@ function traverseElement(element, bandicootElements, bandicootLists,
           }
 
           var newObject = require('./domEl-to-jsEl.js')(element);
-          newObject.cloneDeep = require('./index.js').dependencies.cloneDeep.bind(newObject);
+          newObject.cloneDeep = domMapping.dependencies.cloneDeep.bind(newObject);
 
           if (bandicootListToAddTo) {
             newObject.dataType = 'list-item';
@@ -85,6 +87,41 @@ function traverseElement(element, bandicootElements, bandicootLists,
           bandicootObjectToAddTo = newObject; 
         break;
 
+        case 'table':
+          var newObject = require('./domEl-to-jsEl.js')(element);
+          newObject.cloneDeep = domMapping.dependencies.cloneDeep.bind(newObject);
+          newObject.dataType = 'table';
+          var newTable = [];
+          _.assign(newTable, newObject);
+
+          if (bandicootObjectToAddTo[dataName]) {
+            throw "Object named '" + dataName + "' already exists";
+          }
+
+          bandicootObjectToAddTo[dataName] = newTable;
+
+          if (bandicootTableToAddTo) {
+            throw "Tables within tables are not yet supported";
+          }
+
+          bandicootTableToAddTo = newTable;
+        break;
+
+        case 'table-row':
+          var newObject = require('./domEl-to-jsEl.js')(element);
+          newObject.cloneDeep = domMapping.dependencies.cloneDeep.bind(newObject);
+          newObject.dataType = 'table-row';
+
+          if (!bandicootTableToAddTo) {
+            throw "Table rows must be inside of data-type='table' elements";
+          }
+
+          bandicootTableToAddTo.push(newObject);
+
+          bandicootObjectToAddTo = newObject;
+          bandicootListToAddTo = bandicootListItemToAddTo = undefined;
+        break;
+
         default:
           throw "Unknown data-type '" + dataType + "' in element '" + element.tagName + "'";
       }
@@ -94,20 +131,20 @@ function traverseElement(element, bandicootElements, bandicootLists,
   for (var i=0; i<element.childNodes.length; i++) {
     var childNode = element.childNodes[i];
     if (childNode.tagName && childNode.tagName.toUpperCase() === 'SCRIPT') {
-      var dataName = element.getAttribute('data-name');
+      var dataName = childNode.getAttribute('data-name');
       if (buildingBlocks[dataName]) {
         throw "Two building blocks have the same name '" + dataName + "'";
       }
 
       var lists = {};
       var elements = {};
-      var objects = {};
+      var objects = [];
       var listToAddTo = listItemToAddTo = undefined;
 
       var domParser = new DOMParser();
       var parsedDom = domParser.parseFromString(childNode.text, "text/html");
       traverseElement(parsedDom, elements, lists, listToAddTo, listItemToAddTo,
-        objects, buildingBlocks);
+        objects, objects, buildingBlocks);
 
       buildingBlocks[dataName] = {
         lists: lists,
@@ -118,7 +155,8 @@ function traverseElement(element, bandicootElements, bandicootLists,
     } else {
       //not a script tag
       traverseElement(childNode, bandicootElements, bandicootLists,
-        bandicootListToAddTo, bandicootListItemToAddTo, bandicootObjectToAddTo, buildingBlocks);   
+        bandicootListToAddTo, bandicootListItemToAddTo, bandicootObjectToAddTo, 
+        bandicootTableToAddTo, buildingBlocks);   
     }
   }
 };
@@ -159,11 +197,11 @@ module.exports = function(location) {
   var bandicootLists = {};
   var bandicootElements = {};
   var bandicootObjects = {};
-  var bandicootListToAddTo = bandicootListItemToAddTo = undefined;
+  var bandicootListToAddTo = bandicootListItemToAddTo = bandicootTableToAddTo = undefined;
   var buildingBlocks = {};
 
   traverseElement(domLocation, bandicootElements, bandicootLists, bandicootListToAddTo, bandicootListItemToAddTo, 
-    bandicootObjects, buildingBlocks);
+    bandicootObjects, bandicootTableToAddTo, buildingBlocks);
 
   mergeListsElementsAndObjects(result.dom, bandicootLists, bandicootElements, bandicootObjects);
 
