@@ -96,6 +96,8 @@ function triggerEvent(eventName, domArgs) {
     keyboardEvent = domArgs[0];
   }
 
+  
+
   if (event.condition) {
     var args = applicationArgsCreator(domVariables, eventSourcePath, eventSourceDomElement, keyboardEvent);
     var eventConditionMet = event.condition.apply(args);

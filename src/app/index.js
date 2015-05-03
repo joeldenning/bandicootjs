@@ -2,6 +2,7 @@ module.exports.build = function() {
   module.exports.Locations = {};
   module.exports.Events = {};
   module.exports.Scenarios = {};
+  module.exports.Services = {};
 
   return {
     app: {
@@ -11,9 +12,11 @@ module.exports.build = function() {
       EventPrototype: require('./prototype/Event.js'),
       Scenarios: module.exports.Scenarios,
       ScenarioPrototype: require('./prototype/Scenario.js'),
+      Services: module.exports.Services
     },
     Location: require('./execution/Location.js'),
     Event: require('./execution/Event.js'),
     Scenario: require('./execution/Scenario.js'),
+    Services: require('./execution/Services.js')
   };
 };
