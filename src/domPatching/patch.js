@@ -130,7 +130,8 @@ module.exports = function(location, currentDomState, desiredDomState) {
             break;
           }
         } else if (domElement) {
-          var domListItems = domElement.querySelectorAll('[data-type="list-item"]');
+          var childDataType = jsDomEl.dataType === 'table' ? 'table-row' : 'list-item'
+          var domListItems = domElement.querySelectorAll('[data-type="' + childDataType + '"]');
           var index = diff.index;
           switch (diff.item.kind) {
             case 'N': //new item
