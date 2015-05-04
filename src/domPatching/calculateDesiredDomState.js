@@ -1,10 +1,14 @@
+var removeFunctions = require('./removeFunctions.js');
+
 module.exports = function(currentDomState, domPatches) {
   var domPatching = require('./index.js');
 
   var domState = domPatching.dependencies.cloneDeep(currentDomState);
+  removeFunctions(domState);
 
   for (var domPatchName in domPatches) {
     var domPatch = domPatches[domPatchName];
+    removeFunctions(domPatch);
     var diffs = domPatching.dependencies.deepDiff.diff(domState, domPatch);
     if (diffs) {
       /* apply the diffs to the domState in reverse order, since applying in 

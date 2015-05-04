@@ -3,6 +3,7 @@ var transferAttrFromDomElToObj = require('./index.js').dependencies.domMapping.t
 var deepDiff = require('./index.js').dependencies.deepDiff;
 var jsElToDomEl = require('./jsToDom.js').jsElToDomEl;
 var setJsAttrAsDomAttr = require('./jsToDom.js').setJsAttrAsDomAttr;
+var removeFunctions = require('./removeFunctions.js');
 
 function updateStyle(elementStyles, domElement, diff, operation) {
   var styleProperty = diff.path[diff.path.length-1];
@@ -21,6 +22,9 @@ function updateStyle(elementStyles, domElement, diff, operation) {
 }
 
 module.exports = function(location, currentDomState, desiredDomState) {
+  removeFunctions(currentDomState);
+  removeFunctions(desiredDomState);
+
   var domPatching = require('./index.js');
 
   var diffs = deepDiff.diff(currentDomState, desiredDomState, function(key, path) {
@@ -46,10 +50,6 @@ module.exports = function(location, currentDomState, desiredDomState) {
     for (var j=0; j<diff.path.length && continueSearching; j++) {
       var partOfPath = diff.path[j];
       jsDomEl = jsDomEl[partOfPath];
-      if (_.isFunction(jsDomEl)) {
-        //we don't patch dom functions
-        continue;
-      }
       var searchIndex = _.parseInt(partOfPath);
       if (!isNaN(searchIndex)) {
         //get the list item corresponding to this number
@@ -57,7 +57,9 @@ module.exports = function(location, currentDomState, desiredDomState) {
         var listItemIndex = 0;
         for (var k=0; k<domElement.children.length; k++) {
           var child = domElement.children[k];
-          if (child.getAttribute('data-type') === 'list-item' && listItemIndex++ === searchIndex) {
+          var childDataType = child.getAttribute('data-type');
+          if ( (childDataType === 'list-item' || childDataType === 'table-row') 
+              && listItemIndex++ === searchIndex) {
             domElement = child;
             childFound = true;
             break;
@@ -91,7 +93,7 @@ module.exports = function(location, currentDomState, desiredDomState) {
         if (elementAttribute) {
           switch(diff.item.kind) {
             case 'D': //a deleted item in the current dom is a new item in the desired dom
-              if (diff.item.lhs) {
+              if (typeof diff.item.lhs !== 'undefined') {
                 domOperationsToPerform.push({
                   type: 'setJsAttrAsDomAttr',
                   attrName: attrName,
@@ -167,22 +169,17 @@ module.exports = function(location, currentDomState, desiredDomState) {
         }
       break;
       case 'E': //edit
-        if (_.isFunction(diff.rhs) || _.isFunction(diff.lhs)) {
-          //we don't ever patch any functions, so this patch is supported
+        if (elementAttribute) {
+          domOperationsToPerform.push({
+            type: 'setJsAttrAsDomAttr',
+            attrName: attrName,
+            attrValue: diff.rhs,
+            element: domElement
+          });
           patchSupported = true;
-        } else {
-          if (elementAttribute) {
-            domOperationsToPerform.push({
-              type: 'setJsAttrAsDomAttr',
-              attrName: attrName,
-              attrValue: diff.rhs,
-              element: domElement
-            });
-            patchSupported = true;
-          } else if (diff.path[diff.path.length-2] === 'style') {
-            updateStyle(elementStyles, domElement, diff, 'set');
-            patchSupported = true;
-          }
+        } else if (diff.path[diff.path.length-2] === 'style') {
+          updateStyle(elementStyles, domElement, diff, 'set');
+          patchSupported = true;
         }
       break;
       case 'N': //new
