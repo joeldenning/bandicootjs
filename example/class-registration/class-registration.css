@@ -1,13 +1,26 @@
 .class-registration-layout {
   display: table;
+  margin: 10px;
 }
 
 .class-registration-column {
   display: table-cell;
+  margin: 5px;
+}
+
+.pretty-table {
+  margin: 15px;
 }
 
 .pretty-table tr,th {
-  border: 1px;
-  border-color: gray;
   padding: 5px;
+}
+
+.courses-search-input {
+  text-align: center;
+}
+
+.course-row:hover {
+  cursor: hand;
+  background-color: rgba(0,0,0,.25);
 }

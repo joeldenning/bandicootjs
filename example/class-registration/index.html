@@ -1,6 +1,7 @@
 <html>
   <head>
     <link rel="stylesheet" type="css" href="/bandicootjs/example/class-registration/class-registration.css"></link>
+    <link href="http://d2v52k3cl9vedd.cloudfront.net/basscss/6.0.2/basscss.min.css" rel="stylesheet">
 
     <script type="text/javascript" src="/bandicootjs/dist/bandicoot.js"></script>
 
@@ -20,19 +21,25 @@
   <body>
     <div class="class-registration-layout">
       <div class="class-registration-column" data-location="courses">
-        Search for courses:<input type="text" data-name="search" data-type="object" onkeyup="coot.Event('courses/filter changed')">
-        <table class="pretty-table" data-name="visibleCourses" data-type="table">
-          <tr>
-            <th>Course ID</th><th>Department</th><th>Course Name</th><th>Credits</th>
-          </tr>
+        <div class="courses-search-input">
+          <input type="text" class="field-light" data-name="search" data-type="object" onkeyup="coot.Event('courses/filter changed', arguments)">
+          <button class="button">Search</button>
+        </div>
+        <table class="pretty-table table-light overflow-hidden bg-white border rounded border" 
+            data-name="visibleCourses" data-type="table">
+          <thead class="bg-darken-2">
+            <tr>
+              <th>Course ID</th><th>Course Name</th><th>Department</th><th>Credits</th>
+            </tr>
+          </thead>
         </table>
 
         <script type="html/building-blocks">
           <table>
-            <tr data-type="table-row" data-name="course">
+            <tr data-type="table-row" data-name="course" class="course-row">
               <td data-type="element" data-name="courseId"></td>
-              <td data-type="element" data-name="department"></td>
               <td data-type="element" data-name="courseName"></td>
+              <td data-type="element" data-name="department"></td>
               <td data-type="element" data-name="credits"></td>
             </tr>
           </table>

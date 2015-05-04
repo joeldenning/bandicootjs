@@ -23,5 +23,21 @@ coot.Service({
   },
   getPopularCourses: function() {
     return this.courses.find({ popularity: { '$gt': 75 } });
+  },
+  searchAllFields: function(query) {
+    var keywords = query.trim().split(" ");
+    var regex = new RegExp(keywords.join("|"), "i");
+
+    var matches = this.courses.where(function(course) {
+      var doesMatch = 
+        regex.test(course.courseId) ||
+        regex.test(course.department) ||
+        regex.test(course.courseName) ||
+        regex.test(course.credits) ||
+        regex.test(course.popularity);
+      return doesMatch;
+    });
+
+    return matches;
   }
 });
