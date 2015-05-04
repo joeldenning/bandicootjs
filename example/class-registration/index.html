@@ -20,7 +20,7 @@
   <body>
     <div class="class-registration-layout">
       <div class="class-registration-column" data-location="courses">
-        Search for courses:<input type="text" data-name="search" data-type="object">
+        Search for courses:<input type="text" data-name="search" data-type="object" onkeyup="coot.Event('courses/filter changed')">
         <table class="pretty-table" data-name="visibleCourses" data-type="table">
           <tr>
             <th>Course ID</th><th>Department</th><th>Course Name</th><th>Credits</th>

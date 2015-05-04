@@ -92,7 +92,7 @@ function triggerEvent(eventName, domArgs) {
   }
 
   var keyboardEvent;
-  if (domArgs.length === 1 && (domArgs[0].type === 'keydown' || domArgs[0].type === 'keyup')) {
+  if (domArgs && domArgs.length === 1 && (domArgs[0].type === 'keydown' || domArgs[0].type === 'keyup')) {
     keyboardEvent = domArgs[0];
   }
 

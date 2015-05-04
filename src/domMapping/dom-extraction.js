@@ -70,6 +70,7 @@ function traverseElement(element, bandicootElements, bandicootLists,
 
           var newObject = require('./domEl-to-jsEl.js')(element);
           newObject.cloneDeep = domMapping.dependencies.cloneDeep.bind(newObject);
+          newObject.tagName = element.tagName;
 
           if (bandicootListToAddTo) {
             newObject.dataType = 'list-item';
@@ -91,6 +92,7 @@ function traverseElement(element, bandicootElements, bandicootLists,
           var newObject = require('./domEl-to-jsEl.js')(element);
           newObject.cloneDeep = domMapping.dependencies.cloneDeep.bind(newObject);
           newObject.dataType = 'table';
+          newObject.tagName = element.tagName;
           var newTable = [];
           _.assign(newTable, newObject);
 
@@ -111,6 +113,7 @@ function traverseElement(element, bandicootElements, bandicootLists,
           var newObject = require('./domEl-to-jsEl.js')(element);
           newObject.cloneDeep = domMapping.dependencies.cloneDeep.bind(newObject);
           newObject.dataType = 'table-row';
+          newObject.tagName = element.tagName;
 
           if (!bandicootTableToAddTo) {
             throw "Table rows must be inside of data-type='table' elements";
