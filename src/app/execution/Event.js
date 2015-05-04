@@ -96,10 +96,13 @@ function triggerEvent(eventName, domArgs) {
     keyboardEvent = domArgs[0];
   }
 
-  
-
   if (event.condition) {
-    var args = applicationArgsCreator(domVariables, eventSourcePath, eventSourceDomElement, keyboardEvent);
+    var args = applicationArgsCreator({
+      domVariables: domVariables, 
+      eventSourcePath: eventSourcePath,
+      eventSourceDomElement: eventSourceDomElement,
+      keyboardEvent: keyboardEvent
+    });
     var eventConditionMet = event.condition.apply(args);
     if (eventConditionMet !== true) {
       console.log("Event condition was not met");
@@ -111,7 +114,15 @@ function triggerEvent(eventName, domArgs) {
 
   Object.keys(possibleScenarios).forEach(function(possibleScenarioName) {
     var possibleScenario = possibleScenarios[possibleScenarioName];
-    var args = applicationArgsCreator(domVariables, eventSourcePath, eventSourceDomElement, keyboardEvent);
+    var services = possibleScenario.inject ? possibleScenario.inject.services : [];
+    var args = applicationArgsCreator({
+      domVariables: domVariables,
+      eventSourcePath: eventSourcePath,
+      eventSourceDomElement: eventSourceDomElement,
+      keyboardEvent: keyboardEvent,
+      services: services,
+      owner: event.owner
+    });
 
     var booleanExpressionResult;
     try {
@@ -151,7 +162,16 @@ function triggerEvent(eventName, domArgs) {
 
     var scenario = scenariosToExecute[randomIndex];
     try {
-      var args = applicationArgsCreator(domVariables, eventSourcePath, eventSourceDomElement);
+      var services = scenario.inject ? scenario.inject.services : [];
+      var args = applicationArgsCreator({
+        domVariables: domVariables,
+        eventSourcePath: eventSourcePath,
+        eventSourceDomElement: eventSourceDomElement,
+        keyboardEvent: keyboardEvent,
+        services: services,
+        owner: event.owner
+      });
+
       scenario.outcome.call(args);
       scenarioDomState[ScenarioPrototype.getFullyQualifiedName(scenario)] = args.dom;
       atLeastOneScenarioSucceeded = true;

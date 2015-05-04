@@ -30,6 +30,7 @@ module.exports.build = function() {
     module.defineStrictlyTypedObject('DomMapping', require('../strictTyping/objectDefinitions/DomMapping.js'));
     module.defineStrictlyTypedObject('LocationInject', require('../strictTyping/objectDefinitions/LocationInject.js'));
     module.defineStrictlyTypedObject('VariableTypeDefinitions', require('../strictTyping/objectDefinitions/VariableTypeDefinitions.js'));
+    module.defineStrictlyTypedObject('ScenarioInject', require('../strictTyping/objectDefinitions/ScenarioInject.js'));
     module.defineStrictlyTypedObject('Scenario', require('../strictTyping/objectDefinitions/Scenario.js'));
     module.defineStrictlyTypedObject('EventInject', require('../strictTyping/objectDefinitions/EventInject.js'));
     module.defineStrictlyTypedObject('Event', require('../strictTyping/objectDefinitions/Event.js'));

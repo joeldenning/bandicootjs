@@ -13,7 +13,7 @@ module.exports.build = function() {
         var type = service.inject[property];
         switch (type) {
           case 'loki':
-            result[property] = new deps.loki();
+            result[property] = new deps.loki(service.service);
           break;
           default:
             throw "Cannot inject property '" + property + "' into service -- unknown type '" + type + "'";

@@ -8,6 +8,7 @@ module.exports = function(objectDefinitionBuilder) {
   objectDefinitionBuilder.addProperty('domVariables').withType('object').whereEachPropertyIs('string').matchingPattern(/ul|li|div/)
   objectDefinitionBuilder.addProperty('domExamples').withType('object').whereEachPropertyIs('string').matchingPattern(/ul|li|div/)  
   objectDefinitionBuilder.addProperty('services').withType('array').whereEachElementIs('string').matchingPattern(/[^ ]/)
+  objectDefinitionBuilder.addProperty('inject').withType('strictlyTypedObject', 'ScenarioInject');
 
   objectDefinitionBuilder.requireProperty('scenario');
   objectDefinitionBuilder.requireProperty('location');

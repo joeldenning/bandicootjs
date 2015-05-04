@@ -17,11 +17,15 @@ module.exports = function(input) {
 
     var injectedProps = app.dependencies.serviceInjector.getPropertiesToInject(service);
 
-    app.dependencies.slashNamespacing.addPropertyToObjectFromSlashNamespacedName(app.ServiceInjectedProperties, injectedProps);
+    for (var property in service) {
+      if (typeof service[property] === 'function') {
+        service[property] = service[property].bind(injectedProps);
+      }
+    }
     
     if (service.initialize) {
       try {
-        service.initialize.call(injectedProps);
+        service.initialize();
       } catch (ex) {
         throw "Error constructing service '" + fullyQualifiedName + "': " + ex;
       }

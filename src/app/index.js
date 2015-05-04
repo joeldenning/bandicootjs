@@ -3,7 +3,6 @@ module.exports.build = function() {
   module.exports.Events = {};
   module.exports.Scenarios = {};
   module.exports.Services = {};
-  module.exports.ServiceInjectedProperties = {};
 
   return {
     app: {
