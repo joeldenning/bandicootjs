@@ -44,11 +44,8 @@ module.exports = function(element) {
     jsEl.checked = element.checked;
   }
 
-  if (element.textContent) {
-    var text = require('./parseTextAttribute.js')(element);
-    if (text.trim().length > 0) {
-      jsEl.text = text;
-    }
+  if (typeof element.textContent === 'string') {
+    jsEl.text = require('./parseTextAttribute.js')(element);
   }
 
   return jsEl;

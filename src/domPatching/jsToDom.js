@@ -1,5 +1,52 @@
 var _ = require('./index.js').dependencies.lodash;
 
+var jsElToDomEl = module.exports.jsElToDomEl = function(jsDomEl) {
+  var newDomElement = document.createElement(jsDomEl.tagName);
+
+  if (_.isArray(jsDomEl)) {
+    newDomElement.setAttribute('data-type', jsDomEl['data-type']);
+    newDomElement.setAttribute('data-name', jsDomEl['data-name']);
+    for (var property in jsDomEl) {
+      var index = _.parseInt(property);
+      if (!isNaN(index)) {
+        newDomElement.appendChild(jsElToDomEl(jsDomEl[property]))
+      }
+    }
+  } else if (_.isPlainObject(jsDomEl)) {
+    for (var attr in jsDomEl) {
+      var attrValue = jsDomEl[attr];
+      if (attrValue.tagName) {
+        //domEl
+        if (attr === 'tagName') {
+          continue;
+        } else if (attr.indexOf('data-') === 0) {
+          setJsAttrAsDomAttr('data' + attr.substr(5, attr.length - 5), attrValue, newDomElement);
+        } else {
+          setJsAttrAsDomAttr(attr, attrValue, newDomElement);
+        }
+      } else if (attr === 'style') {
+        if (!_.isPlainObject(attrValue)) {
+          throw "The style property must be a plain javascript object";
+        }
+        var styleAsString = '';
+        var prefix = '';
+        for (var cssAttr in attrValue) {
+          var cssValue = attrValue[cssAttr];
+          styleAsString += prefix + cssAttr + ": " + cssValue;
+          prefix = '; ';
+        }
+        setJsAttrAsDomAttr('style', styleAsString, newDomElement);
+      } else {
+        setJsAttrAsDomAttr(attr, attrValue, newDomElement);
+      }
+    }
+  } else {
+    setJsAttrAsDomAttr(attr, attrValue, newDomElement);
+  }
+  
+  return newDomElement;
+};
+
 var setJsAttrAsDomAttr = module.exports.setJsAttrAsDomAttr = function(key, value, domEl) {
   if (key === 'tagName') {
     //already encapsulated by the element type
@@ -47,50 +94,3 @@ var setJsAttrAsDomAttr = module.exports.setJsAttrAsDomAttr = function(key, value
     domEl.appendChild(newEl);
   }
 }
-
-var jsElToDomEl = module.exports.jsElToDomEl = function(jsDomEl) {
-  var newDomElement = document.createElement(jsDomEl.tagName);
-
-  if (_.isArray(jsDomEl)) {
-    newDomElement.setAttribute('data-type', jsDomEl['data-type']);
-    newDomElement.setAttribute('data-name', jsDomEl['data-name']);
-    for (var property in jsDomEl) {
-      var index = _.parseInt(property);
-      if (!isNaN(index)) {
-        newDomElement.appendChild(jsElToDomEl(jsDomEl[property]))
-      }
-    }
-  } else if (_.isPlainObject(jsDomEl)) {
-    for (var attr in jsDomEl) {
-      var attrValue = jsDomEl[attr];
-      if (attrValue.tagName) {
-        //domEl
-        if (attr === 'tagName') {
-          continue;
-        } else if (attr.indexOf('data-') === 0) {
-          setJsAttrAsDomAttr('data' + attr.substr(5, attr.length - 5), attrValue, newDomElement);
-        } else {
-          setJsAttrAsDomAttr(attr, attrValue, newDomElement);
-        }
-      } else if (attr === 'style') {
-        if (!_.isPlainObject(attrValue)) {
-          throw "The style property must be a plain javascript object";
-        }
-        var styleAsString = '';
-        var prefix = '';
-        for (var cssAttr in attrValue) {
-          var cssValue = attrValue[cssAttr];
-          styleAsString += prefix + cssAttr + ": " + cssValue;
-          prefix = '; ';
-        }
-        setJsAttrAsDomAttr('style', styleAsString, newDomElement);
-      } else {
-        setJsAttrAsDomAttr(attr, attrValue, newDomElement);
-      }
-    }
-  } else {
-    setJsAttrAsDomAttr(attr, attrValue, newDomElement);
-  }
-  
-  return newDomElement;
-};

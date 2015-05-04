@@ -22,10 +22,10 @@ coot.Scenario({
     for (var i=0; i<popularCourses.length; i++) {
       var popularCourse = popularCourses[i];
       var course = this.buildingBlocks[0].cloneDeep();
-      course.courseId = popularCourse.courseId;
-      course.courseName = popularCourse.courseName;
-      course.department = popularCourse.department;
-      course.credits = popularCourse.credits;
+      course.courseId.text = popularCourse.courseId;
+      course.courseName.text = popularCourse.courseName;
+      course.department.text = popularCourse.department;
+      course.credits.text = popularCourse.credits;
       
       this.dom.visibleCourses.push(course);
     }
