@@ -4,14 +4,16 @@
     <link href="http://d2v52k3cl9vedd.cloudfront.net/basscss/6.0.2/basscss.min.css" rel="stylesheet">
 
     <script type="text/javascript" src="/bandicootjs/dist/bandicoot.js"></script>
+    <script type="text/javascript" src="/bandicoot-loki/bundle.js"></script>
 
     <script type="text/javascript" src="/bandicootjs/example/class-registration/calendar/location.js"></script>
     <script type="text/javascript" src="/bandicootjs/example/class-registration/courses/location.js"></script>
-    <script type="text/javascript" src="/bandicootjs/example/class-registration/courses/filter changed.js"><script>
-    <script type="text/javascript" src="/bandicootjs/example/class-registration/courses/service.js"><script>
+    <script type="text/javascript" src="/bandicootjs/example/class-registration/courses/filter changed.js"></script>
+    <script type="text/javascript" src="/bandicootjs/example/class-registration/courses/course selected.js"></script>
     <script type="text/javascript" src="/bandicootjs/example/class-registration/register/location.js"></script>
     <script type="text/javascript" src="/bandicootjs/example/class-registration/sections/location.js"></script>
     <script type="text/javascript" src="/bandicootjs/example/class-registration/courses/services.js"></script>
+
     <script type="text/javascript">
       window.onload = function() {
         coot.Event('courses/filter changed', arguments);
@@ -36,7 +38,7 @@
 
         <script type="html/building-blocks">
           <table>
-            <tr data-type="table-row" data-name="course" class="course-row">
+            <tr data-type="table-row" data-name="course"  onclick="coot.Event('courses/course selected', arguments)" class="course-row">
               <td data-type="element" data-name="courseId"></td>
               <td data-type="element" data-name="courseName"></td>
               <td data-type="element" data-name="department"></td>

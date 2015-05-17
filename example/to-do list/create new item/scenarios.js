@@ -30,15 +30,3 @@ coot.Scenario({
     alert('I am sorry but you can\'t add an item full of whitespace characters');
   }
 });
-
-coot.Scenario({
-  location: 'To-do list',
-  event: 'toggle item checked',
-  scenario: 'strike out the corresponding item',
-  condition: function() {
-    return this.event.source.checkbox.checked;
-  },
-  outcome: function() {
-    this.event.source.class.push('completed-item');
-  }
-});

@@ -24,3 +24,8 @@
   cursor: hand;
   background-color: rgba(0,0,0,.25);
 }
+
+.selected-row {
+  cursor: hand;
+  background-color: rgba(0,0,0,0.25);
+}

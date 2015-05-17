@@ -21,7 +21,7 @@ coot.Scenario({
     var popularCourses = this.services.Courses.getPopularCourses();
     for (var i=0; i<popularCourses.length; i++) {
       var popularCourse = popularCourses[i];
-      var course = this.buildingBlocks[0].cloneDeep();
+      var course = this.buildingBlocks.course.cloneDeep();
       course.courseId.text = popularCourse.courseId;
       course.courseName.text = popularCourse.courseName;
       course.department.text = popularCourse.department;
@@ -49,7 +49,7 @@ coot.Scenario({
 
     for (var i=0; i<matchingCourses.length; i++) {
       var matchingCourse = matchingCourses[i];
-      var course = this.buildingBlocks[0].cloneDeep();
+      var course = this.buildingBlocks.course.cloneDeep();
       course.courseId.text = matchingCourse.courseId;
       course.courseName.text = matchingCourse.courseName;
       course.department.text = matchingCourse.department;
