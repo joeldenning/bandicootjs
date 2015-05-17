@@ -1,6 +1,12 @@
 var domMapping = require('./index.js');
 var _ = domMapping.dependencies.lodash;
 
+function logAndThrowException(element, exception) {
+  console.log('Element that caused exception:');
+  console.log(element);
+  throw exception;
+}
+
 function traverseElement(element, bandicootElements, bandicootLists,
     bandicootListToAddTo, bandicootListItemToAddTo, bandicootObjectToAddTo, 
     bandicootTableToAddTo, buildingBlocks) {
@@ -13,7 +19,7 @@ function traverseElement(element, bandicootElements, bandicootLists,
       switch(dataType) {
         case 'element':
           if (!dataName) {
-            throw 'element must have a data-name';
+            logAndThrowException(element, 'element must have a data-name');
           }
 
           var jsEl = require('./domEl-to-jsEl.js')(element);
@@ -24,11 +30,11 @@ function traverseElement(element, bandicootElements, bandicootLists,
             bandicootListItemToAddTo[dataName] = jsEl;
           } else if (bandicootObjectToAddTo) {
             if (bandicootObjectToAddTo[dataName]) {
-              throw "element named '" + dataName + "' already exists in current object";
+              logAndThrowException(element, "element named '" + dataName + "' already exists in current object");
             }
             bandicootObjectToAddTo[dataName] = jsEl;
           } else if (bandicootElements[dataName]) {
-            throw "element named '" + dataName + "' already exists";
+            logAndThrowException(element, "element named '" + dataName + "' already exists");
           } else {
             bandicootElements[dataName] = jsEl;
           }
@@ -36,7 +42,7 @@ function traverseElement(element, bandicootElements, bandicootLists,
 
         case 'list':
           if (!dataName) {
-            throw 'list must have a data-name';
+            logAndThrowException(element, 'list must have a data-name');
           }
 
           bandicootListToAddTo = [];
@@ -56,7 +62,7 @@ function traverseElement(element, bandicootElements, bandicootLists,
           bandicootListItemToAddTo = undefined;
 
           if (bandicootLists[dataName]) {
-            throw "list named '" + dataName + "' already exists";
+            logAndThrowException(element, "list named '" + dataName + "' already exists");
           }
 
           bandicootLists[dataName] = bandicootListToAddTo;
@@ -78,7 +84,7 @@ function traverseElement(element, bandicootElements, bandicootLists,
             bandicootListToAddTo = undefined;
           } else {
             if (bandicootObjectToAddTo[dataName]) {
-              throw "Object named '" + dataName + "' already exists";
+              logAndThrowException(element, "Object named '" + dataName + "' already exists");
             }
 
             newObject.dataType = 'object';
@@ -89,6 +95,9 @@ function traverseElement(element, bandicootElements, bandicootLists,
         break;
 
         case 'table':
+          if (!dataName) {
+            logAndThrowException(element, 'tables must have a data-name');
+          }
           var newObject = require('./domEl-to-jsEl.js')(element);
           newObject.cloneDeep = domMapping.dependencies.cloneDeep.bind(newObject);
           newObject.dataType = 'table';
@@ -97,13 +106,13 @@ function traverseElement(element, bandicootElements, bandicootLists,
           _.assign(newTable, newObject);
 
           if (bandicootObjectToAddTo[dataName]) {
-            throw "Object named '" + dataName + "' already exists";
+            logAndThrowException(element, "Object named '" + dataName + "' already exists");
           }
 
           bandicootObjectToAddTo[dataName] = newTable;
 
           if (bandicootTableToAddTo) {
-            throw "Tables within tables are not yet supported";
+            logAndThrowException(element, "Tables within tables are not yet supported.");
           }
 
           bandicootTableToAddTo = newTable;
@@ -115,18 +124,21 @@ function traverseElement(element, bandicootElements, bandicootLists,
           newObject.dataType = 'table-row';
           newObject.tagName = element.tagName;
 
-          if (!bandicootTableToAddTo) {
-            throw "Table rows must be inside of data-type='table' elements";
+          if (bandicootTableToAddTo) {
+            bandicootTableToAddTo.push(newObject);
+          } else {
+            if (!dataName) {
+              logAndThrowException(element, 'When table-row is not inside of a table, it must have a data-name');
+            }
+            bandicootObjectToAddTo[dataName] = newObject;
           }
-
-          bandicootTableToAddTo.push(newObject);
 
           bandicootObjectToAddTo = newObject;
           bandicootListToAddTo = bandicootListItemToAddTo = undefined;
         break;
 
         default:
-          throw "Unknown data-type '" + dataType + "' in element '" + element.tagName + "'";
+          logAndThrowException(element, "Unknown data-type '" + dataType + "' in element '" + element.tagName + "'");
       }
     }
   }
@@ -135,25 +147,21 @@ function traverseElement(element, bandicootElements, bandicootLists,
     var childNode = element.childNodes[i];
     if (childNode.tagName && childNode.tagName.toUpperCase() === 'SCRIPT') {
       var dataName = childNode.getAttribute('data-name');
-      if (buildingBlocks[dataName]) {
-        throw "Two building blocks have the same name '" + dataName + "'";
-      }
-
       var lists = {};
       var elements = {};
-      var objects = [];
-      var listToAddTo = listItemToAddTo = undefined;
+      var objects = {};
+      var listToAddTo = listItemToAddTo = tableToAddTo = undefined;
 
       var domParser = new DOMParser();
       var parsedDom = domParser.parseFromString(childNode.text, "text/html");
       traverseElement(parsedDom, elements, lists, listToAddTo, listItemToAddTo,
-        objects, objects, buildingBlocks);
+        objects, tableToAddTo, buildingBlocks);
 
-      buildingBlocks[dataName] = {
+      buildingBlocks.push({
         lists: lists,
         elements: elements,
         objects: objects
-      };
+      });
 
     } else {
       //not a script tag
@@ -183,14 +191,20 @@ function mergeListsElementsAndObjects(target, lists, elements, objects) {
 }
 
 module.exports = function(location) {
-  var matchingLocations = document.querySelectorAll('[data-location="' + location + '"]');
-  if (matchingLocations.length < 1) {
-    throw "Could not find location '" + location + "' in the DOM";
-  } else if (matchingLocations.length > 1) {
-    throw "Clashing locations: there are two locations named '" + location + "'";
-  }
+  var domRoot;
+  if (location.nodeType) {
+    //the location is actually just a dom element
+    domRoot = location;
+  } else {
+    var matchingLocations = document.querySelectorAll('[data-location="' + location + '"]');
+    if (matchingLocations.length < 1) {
+      throw "Could not find location '" + location + "' in the DOM";
+    } else if (matchingLocations.length > 1) {
+      throw "Clashing locations: there are two locations named '" + location + "'";
+    }
 
-  var domLocation = matchingLocations[0];
+    domRoot = matchingLocations[0];
+  }
 
   var result = {
     dom: {},
@@ -201,15 +215,15 @@ module.exports = function(location) {
   var bandicootElements = {};
   var bandicootObjects = {};
   var bandicootListToAddTo = bandicootListItemToAddTo = bandicootTableToAddTo = undefined;
-  var buildingBlocks = {};
+  var buildingBlocks = [];
 
-  traverseElement(domLocation, bandicootElements, bandicootLists, bandicootListToAddTo, bandicootListItemToAddTo, 
+  traverseElement(domRoot, bandicootElements, bandicootLists, bandicootListToAddTo, bandicootListItemToAddTo, 
     bandicootObjects, bandicootTableToAddTo, buildingBlocks);
 
   mergeListsElementsAndObjects(result.dom, bandicootLists, bandicootElements, bandicootObjects);
 
-  for (var buildingBlockName in buildingBlocks) {
-    var buildingBlock = buildingBlocks[buildingBlockName];
+  for (var i=0; i<buildingBlocks.length; i++) {
+    var buildingBlock = buildingBlocks[i];
     mergeListsElementsAndObjects(result.buildingBlocks, buildingBlock.lists, 
         buildingBlock.elements, buildingBlock.objects);
   }
