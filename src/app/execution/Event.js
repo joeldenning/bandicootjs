@@ -76,7 +76,8 @@ function triggerEvent(eventName, domArgs) {
 
   if (event.inject) {
     if (!domArgs) {
-      throw "The dom event arguments were not passed into the function -- cannot inject them";
+      throw "The dom event arguments for Event '" + EventPrototype.getFullyQualifiedName(event) + 
+          "' were not passed into the function -- cannot inject them";
     }
 
     try {
@@ -110,6 +111,8 @@ function triggerEvent(eventName, domArgs) {
     }
   }
 
+  var eventSourceJsEl;
+
   var scenariosToExecute = [];
 
   Object.keys(possibleScenarios).forEach(function(possibleScenarioName) {
@@ -118,7 +121,6 @@ function triggerEvent(eventName, domArgs) {
     var args = applicationArgsCreator({
       domVariables: domVariables,
       eventSourcePath: eventSourcePath,
-      eventSourceDomElement: eventSourceDomElement,
       keyboardEvent: keyboardEvent,
       services: services,
       owner: event.owner
@@ -141,7 +143,6 @@ function triggerEvent(eventName, domArgs) {
   }
 
   var scenarioDomState = {};
-
 
   //we iterate through the scenarios randomly so that no one depends on scenario execution order.
   function getRandomInt(min, max) {
@@ -166,7 +167,6 @@ function triggerEvent(eventName, domArgs) {
       var args = applicationArgsCreator({
         domVariables: domVariables,
         eventSourcePath: eventSourcePath,
-        eventSourceDomElement: eventSourceDomElement,
         keyboardEvent: keyboardEvent,
         services: services,
         owner: event.owner

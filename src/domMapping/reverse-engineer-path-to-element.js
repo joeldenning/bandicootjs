@@ -1,25 +1,26 @@
 function findIndexOfListItem(element) {
-  var i;
-  for (i=0; i<element.parentNode.children.length; i++) {
-    if (element === element.parentNode.children[i]) {
-      break;
-    }
+  var indexOfChildrenWithDataName = 0;
+  for (var i=0; i<element.parentNode.children.length; i++) {
+    var child = element.parentNode.children[i];
+    if (element === child)
+      return indexOfChildrenWithDataName;
+    if (child.getAttribute('data-name'))
+      indexOfChildrenWithDataName++;
   }
-  return i;
+  throw "Could not find index";
 }
 
 function reverseEngineerPathToElement(element, pathArray) {
   var dataLocation = element.getAttribute('data-location');
   if (dataLocation) {
-    pathArray.unshift(dataLocation);
     //once we hit the location element, we have traversed everything
     return;
   }
   var dataName = element.getAttribute('data-name');
   if (dataName) {
     var dataType = element.getAttribute('data-type');
-    if (dataType === 'list-item') {
-      pathArray.unshift(findIndexOfListItem(element));
+    if (dataType === 'list-item' || dataType === 'table-row') {
+      pathArray.unshift(findIndexOfListItem(element, dataName));
     } else {
       pathArray.unshift(dataName);
     }

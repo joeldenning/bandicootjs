@@ -2,11 +2,12 @@ module.exports = function(options) {
   var app = require('./index.js');
   var args = app.dependencies.cloneDeep(options.domVariables);
   args.event = {};
-  if (options.eventSourceDomElement) {
+  if (options.eventSourcePath) {
     try {
-      args.event.source = app.dependencies.domMapping.getJSElFromPath(options.domVariables.dom, options.eventSourcePath);
+      args.event.source = app.dependencies.domMapping.getJSElFromPath(args.dom, options.eventSourcePath);
     } catch(ex) {
-      args.event.source = app.dependencies.domMapping.domElToJsEl(options.eventSourceDomElement);
+      console.log(ex);
+      throw "Could not find event element in this event's location";
     }
   }
 
