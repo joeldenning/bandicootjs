@@ -36,14 +36,20 @@ module.exports = function(location, currentDomState, desiredDomState) {
   }
 
   var domOperationsToPerform = [];
-  var elementAttribute, attrName;
+  var attrName;
   var elementStyles = {};
 
   for (var i=0; i<diffs.length; i++) {
     var diff = diffs[i];
 
-    var domElement = document.body.querySelector('[data-location="' + location + '"]');
+    var domElement, elementAttribute;
     var jsDomEl = desiredDomState;
+    if (location.nodeType) {
+      //this is a dom element
+      domElement = location;
+    } else {
+      var domElement = document.body.querySelector('[data-location="' + location + '"]');
+    }
     var continueSearching = true;
     elementAttribute = undefined;
     attrName = undefined;
@@ -92,32 +98,39 @@ module.exports = function(location, currentDomState, desiredDomState) {
       case 'A': //array
         if (elementAttribute) {
           switch(diff.item.kind) {
-            case 'D': //a deleted item in the current dom is a new item in the desired dom
-              if (typeof diff.item.lhs !== 'undefined') {
+            case 'D': //a deleted item in the current dom
+              if (_.isArray(elementAttribute)) {
+                elementAttribute.splice(elementAttribute.indexOf(diff.item.lhs), 1);
                 domOperationsToPerform.push({
                   type: 'setJsAttrAsDomAttr',
                   attrName: attrName,
-                  attrValue: diff.item.lhs,
+                  attrValue: elementAttribute,
+                  element: domElement
+                });
+                patchSupported = true;
+              } else if (_.isString(elementAttribute)) {
+                domOperationsToPerform.push({
+                  type: 'setJsAttrAsDomAttr',
+                  attrName: attrName,
+                  attrValue: '',
                   element: domElement
                 });
                 patchSupported = true;
               }            
             break;
-            case 'N': //a new item in the current dom means that it is deleted in the desired dom
+            case 'N': //a new item to add to the dom
               if (_.isArray(elementAttribute)) {
-                var indexToRemove = elementAttribute.indexOf(diff.item.rhs);
-                if (indexToRemove >= 0) {
-                  elementAttribute.splice(indexToRemove, 1);
+                if (elementAttribute.indexOf(diff.item.rhs) < 0) {
+                  //the current dom doesn't have the property that is in the desired dom.
+                  elementAttribute.push(diff.item.rhs);
                   domOperationsToPerform.push({
                     type: 'setJsAttrAsDomAttr',
                     attrName: attrName,
                     attrValue: elementAttribute,
                     element: domElement
-                  })
-                  patchSupported = true;            
-                } else {
-                  errorMsg = 'could not find existing dom attribute ' + elementAttribute;
-                }
+                  });
+                  patchSupported = true;
+                }     
               } else if (_.isString(elementAttribute)) {
                 domOperationsToPerform.push({
                   type: 'setJsAttrAsDomAttr',

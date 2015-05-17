@@ -1,10 +1,7 @@
 var _ = require ('lodash');
 
 module.exports = function(element, attrName, targetObject) {
-  if (!targetObject) {
-    //just to avoid reference errors
-    targetObject = {};
-  }
+  targetObject || (targetObject = {});
   var value;
   switch(attrName) {
     case 'class':
