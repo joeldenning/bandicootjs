@@ -24,7 +24,7 @@ module.exports.build = function() {
         }
     }
     
-    module.defineStrictlyTypedObject('ServiceInject', require('../strictTyping/objectDefinitions/ServiceInject.js'));
+    module.defineStrictlyTypedObject('ServiceInjectedType', require('../strictTyping/objectDefinitions/ServiceInjectedType.js'));
     module.defineStrictlyTypedObject('Service', require('../strictTyping/objectDefinitions/Service.js'));
     module.defineStrictlyTypedObject('CustomVariableType', require('../strictTyping/objectDefinitions/CustomVariableType.js'));
     module.defineStrictlyTypedObject('DomMapping', require('../strictTyping/objectDefinitions/DomMapping.js'));
