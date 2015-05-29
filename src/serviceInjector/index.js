@@ -3,7 +3,7 @@ module.exports.build = function() {
 
   var injectedTypes = {};
 
-  return {
+  var result = {
     registerInjectedType: function(injectedType) {
       deps.strictTyping.validateObjectIsOfType(injectedType, 'ServiceInjectedType');
       if (injectedTypes[injectedType.name]) {
@@ -34,4 +34,6 @@ module.exports.build = function() {
       return result;
     }
   };
+
+  return result;
 };

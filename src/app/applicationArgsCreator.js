@@ -27,6 +27,7 @@ module.exports = function(options) {
       var fullyQualifiedServiceName = options.owner + '/' + options.services[i];
       var service = app.dependencies.slashNamespacing.getValueFromNamespacedObject(app.Services, fullyQualifiedServiceName);
       if (service) {
+        require('./execution/Service.js').initializeService(service);
         args.services[options.services[i]] = service;
       } else {
         throw "Could not find service '" + options.services[i] + "'";

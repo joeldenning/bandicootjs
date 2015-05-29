@@ -20,7 +20,7 @@
   text-align: center;
 }
 
-.course-row:hover {
+.table-row:hover {
   cursor: hand;
   background-color: rgba(0,0,0,.25);
 }

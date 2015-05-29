@@ -3,7 +3,8 @@ coot.Service({
   service: 'Courses',
   owner: 'joel',
   inject: {
-    db: 'loki'
+    db: 'loki',
+    services: ['Sections']
   },
   initialize: function() {
     this.courses = this.db.addCollection('courses');
@@ -39,5 +40,15 @@ coot.Service({
     });
 
     return matches;
+  },
+  courseSelected: function(courseId) {
+    if (!courseId) {
+      throw "No course provided";
+    }
+    this.selectedCourseId = courseId;
+    this.services.Sections.courseSelectionChanged(courseId);
+  },
+  getSelectedCourseId: function() {
+    return this.selectedCourseId;
   }
 });

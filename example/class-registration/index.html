@@ -10,13 +10,16 @@
     <script type="text/javascript" src="/bandicootjs/example/class-registration/courses/location.js"></script>
     <script type="text/javascript" src="/bandicootjs/example/class-registration/courses/filter changed.js"></script>
     <script type="text/javascript" src="/bandicootjs/example/class-registration/courses/course selected.js"></script>
+    <script type="text/javascript" src="/bandicootjs/example/class-registration/courses/services.js"></script>
     <script type="text/javascript" src="/bandicootjs/example/class-registration/register/location.js"></script>
     <script type="text/javascript" src="/bandicootjs/example/class-registration/sections/location.js"></script>
-    <script type="text/javascript" src="/bandicootjs/example/class-registration/courses/services.js"></script>
+    <script type="text/javascript" src="/bandicootjs/example/class-registration/sections/course changed.js"></script>
+    <script type="text/javascript" src="/bandicootjs/example/class-registration/sections/services.js"></script>
 
     <script type="text/javascript">
       window.onload = function() {
         coot.Event('courses/filter changed', arguments);
+        coot.Event('sections/course changed', arguments);
       }
     </script>
   </head>
@@ -27,7 +30,7 @@
           <input type="text" class="field-light" data-name="search" data-type="object" onkeyup="coot.Event('courses/filter changed', arguments)">
           <button class="button">Search</button>
         </div>
-        <table class="pretty-table table-light overflow-hidden bg-white border rounded border" 
+        <table class="pretty-table table-light overflow-hidden bg-white border rounded-border" 
             data-name="visibleCourses" data-type="table">
           <thead class="bg-darken-2">
             <tr>
@@ -38,7 +41,7 @@
 
         <script type="html/building-blocks">
           <table>
-            <tr data-type="table-row" data-name="course"  onclick="coot.Event('courses/course selected', arguments)" class="course-row">
+            <tr data-type="table-row" data-name="course"  onclick="coot.Event('courses/course selected', arguments)" class="table-row">
               <td data-type="element" data-name="courseId"></td>
               <td data-type="element" data-name="courseName"></td>
               <td data-type="element" data-name="department"></td>
@@ -49,7 +52,30 @@
       </div>
 
       <div class="class-registration-column" data-location="sections">
-        Sections will be shown here
+
+        <script type="html/building-blocks">
+          <div data-type="element" data-name="noCourseSelectedMessage">
+            Please select a course on the left in order to see its sections
+          </div>
+          <table class="pretty-table table-light overflow-hidden bg-white border rounded-border"
+              data-name="visibleSections" data-type="table">
+
+              <thead class="bg-darken-2">
+              <tr>
+                <th>Section Id</th><th>Professor</th><th>Schedule</th><th>Available seats</th>
+              </tr>
+              </thead>
+          </table>
+          <table>
+            <tr data-type="table-row" data-name="course" onclick="coot.Event('sections/section selected', arguments)" class="table-row">
+
+              <td data-type="element" data-name="sectionId"></td>
+              <td data-type="element" data-name="professor"></td>
+              <td data-type="element" data-name="schedule"></td>
+              <td data-type="element" data-name="availableSeats"></td>
+            </tr>
+          </table>
+        </script>
       </div>
 
       <div class="class-registration-column">

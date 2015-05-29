@@ -4,6 +4,10 @@ module.exports.build = function() {
   module.exports.Scenarios = {};
   module.exports.Services = {};
 
+  app.dependencies.serviceInjector.registerInjectedType('services', function(service) {
+    if (module.exports.Services[])
+  });
+
   return {
     app: {
       Locations: module.exports.Locations,

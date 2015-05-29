@@ -1,5 +1,27 @@
+var app = require('../index.js');
+
+module.exports.initializeService = function(service) {
+  if (service._isInitialized) {
+    return;
+  }
+  var injectedProps = app.dependencies.serviceInjector.getPropertiesToInject(service);
+
+  for (var property in service) {
+    if (typeof service[property] === 'function') {
+      service[property] = service[property].bind(injectedProps);
+    }
+  }
+  
+  if (service.initialize) {
+    try {
+      service.initialize();
+    } catch (ex) {
+      throw "Error constructing service '" + fullyQualifiedName + "': " + ex;
+    }
+  }
+}
+
 module.exports = function(input) {
-  var app = require('../index.js');
   var ServicePrototype = require('../prototype/Service.js');
 
   if (typeof input === 'string') {
@@ -13,22 +35,6 @@ module.exports = function(input) {
     var fullyQualifiedName = ServicePrototype.getFullyQualifiedName(service);
     if (typeof ServicePrototype[fullyQualifiedName] !== 'undefined') {
       throw 'Service with name "' + fullyQualifiedName + "' already exists";
-    }
-
-    var injectedProps = app.dependencies.serviceInjector.getPropertiesToInject(service);
-
-    for (var property in service) {
-      if (typeof service[property] === 'function') {
-        service[property] = service[property].bind(injectedProps);
-      }
-    }
-    
-    if (service.initialize) {
-      try {
-        service.initialize();
-      } catch (ex) {
-        throw "Error constructing service '" + fullyQualifiedName + "': " + ex;
-      }
     }
 
     app.dependencies.slashNamespacing.addPropertyToObjectFromSlashNamespacedName(app.Services, fullyQualifiedName, service);

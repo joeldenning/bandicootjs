@@ -13,6 +13,9 @@ coot.Scenario({
   location: 'courses',
   event: 'course selected',
   scenario: 'Make it look selected',
+  inject: {
+    services: ['Courses']
+  },
   condition: function() {
     return true;
   },
@@ -27,5 +30,8 @@ coot.Scenario({
 
     //now add the selected class to the course that was clicked
     this.event.source.class.push('selected-row');
+
+    //store which class is selected
+    this.services.Courses.courseSelected(this.event.source.courseId);
   }
 })
